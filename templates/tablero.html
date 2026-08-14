@@ -7,7 +7,10 @@
     <h1>Resumen e indicadores</h1>
     <p class="muted">MAQ-001 — Zanjadora · {{ kpis.registros_ingresados }} registro(s) ingresados</p>
   </div>
-  <a class="btn-primary" href="{{ url_for('formulario') }}">+ Nuevo registro</a>
+  <div class="page-head-actions">
+    <a class="btn-secondary" href="{{ url_for('exportar_registros') }}">Exportar a Excel</a>
+    <a class="btn-primary" href="{{ url_for('formulario') }}">+ Nuevo registro</a>
+  </div>
 </div>
 
 <section class="kpi-grid">

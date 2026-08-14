@@ -1,9 +1,11 @@
+import csv
+import io
 import os
 from datetime import datetime
 from functools import wraps
 
 from flask import (
-    Flask, render_template, request, redirect, url_for, session, jsonify, flash
+    Flask, render_template, request, redirect, url_for, session, jsonify, flash, Response
 )
 
 import models
@@ -87,6 +89,38 @@ def formulario():
         params=params,
         hoy=datetime.now().strftime("%Y-%m-%d"),
         registros=models.listar_registros(limit=15),
+    )
+
+
+@app.route("/registros/exportar")
+@login_required
+def exportar_registros():
+    registros = models.listar_registros(limit=100000)
+    cols = [
+        "fecha", "turno", "operador", "horometro_inicial", "horometro_final",
+        "combustible_l", "avance_m", "profundidad_cm", "horas_operadas",
+        "consumo_lh", "volumen_m3", "rendimiento_mh", "costo_combustible",
+        "costo_operador", "costo_total", "costo_hora", "costo_metro",
+        "hrs_para_mantencion", "estado_mant", "observaciones",
+    ]
+    headers = [
+        "Fecha", "Turno", "Operador", "Horómetro inicial", "Horómetro final",
+        "Combustible (L)", "Avance (m)", "Profundidad (cm)", "Horas operadas",
+        "Consumo (L/h)", "Volumen (m3)", "Rendimiento (m/h)", "Costo combustible",
+        "Costo operador", "Costo total", "Costo por hora", "Costo por metro",
+        "Horas para mantención", "Estado mantención", "Observaciones",
+    ]
+    output = io.StringIO()
+    output.write(chr(0xFEFF))
+    writer = csv.writer(output, delimiter=";")
+    writer.writerow(headers)
+    for r in registros:
+        writer.writerow(["" if r.get(c) is None else r.get(c) for c in cols])
+    filename = f"zanjadora_registros_{datetime.now().strftime('%Y%m%d')}.csv"
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
     )
 
 

@@ -80,6 +80,7 @@ body {
   margin-bottom: 22px;
 }
 .page-head h1 { margin: 0 0 4px; font-size: 22px; }
+.page-head-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .muted { color: var(--muted); margin: 0; font-size: 14px; }
 
 .btn-primary, .btn-secondary {
