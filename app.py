@@ -147,6 +147,7 @@ def formulario():
                 "avance_m": float(request.form.get("avance_m") or 0),
                 "profundidad_cm": float(request.form.get("profundidad_cm") or params.get("profundidad_zanja_cm") or 0),
                 "observaciones": request.form.get("observaciones"),
+                "horas_sistema_automatico": float(request.form.get("horas_sistema_automatico") or 0),
             }
             if not data["fecha"]:
                 raise ValueError("La fecha es obligatoria.")
@@ -154,6 +155,8 @@ def formulario():
                 raise ValueError("La poza es obligatoria.")
             if data["horometro_final"] < data["horometro_inicial"]:
                 raise ValueError("El horómetro final no puede ser menor que el inicial.")
+            if data["horas_sistema_automatico"] > (data["horometro_final"] - data["horometro_inicial"]):
+                raise ValueError("Las horas de sistema automático no pueden superar las horas operadas.")
             models.crear_registro(data)
             flash("Registro guardado correctamente.", "success")
             return redirect(url_for("formulario"))
@@ -224,6 +227,7 @@ def editar_registro(reg_id):
                 "avance_m": float(request.form.get("avance_m") or 0),
                 "profundidad_cm": float(request.form.get("profundidad_cm") or params.get("profundidad_zanja_cm") or 0),
                 "observaciones": request.form.get("observaciones"),
+                "horas_sistema_automatico": float(request.form.get("horas_sistema_automatico") or 0),
             }
             if not data["fecha"]:
                 raise ValueError("La fecha es obligatoria.")
@@ -231,6 +235,8 @@ def editar_registro(reg_id):
                 raise ValueError("La poza es obligatoria.")
             if data["horometro_final"] < data["horometro_inicial"]:
                 raise ValueError("El horómetro final no puede ser menor que el inicial.")
+            if data["horas_sistema_automatico"] > (data["horometro_final"] - data["horometro_inicial"]):
+                raise ValueError("Las horas de sistema automático no pueden superar las horas operadas.")
             models.actualizar_registro(reg_id, data)
             flash("Registro actualizado correctamente.", "success")
             return redirect(url_for("formulario"))

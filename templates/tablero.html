@@ -82,6 +82,14 @@
     <span class="kpi-value">{{ "%.1f"|format(kpis.horas_operadas_total) }} h</span>
   </div>
   <div class="kpi-card">
+    <span class="kpi-label">% Utilización sistema automático</span>
+    <span class="kpi-value">
+      {% if kpis.utilizacion_automatico_pct is not none %}
+        {{ "%.1f"|format(kpis.utilizacion_automatico_pct) }}%
+      {% else %}—{% endif %}
+    </span>
+  </div>
+  <div class="kpi-card">
     <span class="kpi-label">Combustible total</span>
     <span class="kpi-value">{{ "%.0f"|format(kpis.combustible_total) }} L</span>
   </div>

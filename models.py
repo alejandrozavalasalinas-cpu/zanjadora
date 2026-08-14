@@ -68,6 +68,7 @@ def init_db():
             avance_m REAL,
             profundidad_cm REAL,
             observaciones TEXT,
+            horas_sistema_automatico REAL,
             horas_operadas REAL,
             consumo_lh REAL,
             volumen_m3 REAL,
@@ -114,6 +115,8 @@ def init_db():
     cols_registros = [r["name"] for r in conn.execute("PRAGMA table_info(registros)").fetchall()]
     if "poza" not in cols_registros:
         conn.execute("ALTER TABLE registros ADD COLUMN poza TEXT")
+    if "horas_sistema_automatico" not in cols_registros:
+        conn.execute("ALTER TABLE registros ADD COLUMN horas_sistema_automatico REAL")
 
     row = conn.execute("SELECT COUNT(*) c FROM parametros").fetchone()
     if row["c"] == 0:
@@ -205,6 +208,7 @@ def crear_registro(data):
     cols = [
         "fecha", "turno", "operador", "poza", "horometro_inicial", "horometro_final",
         "combustible_l", "avance_m", "profundidad_cm", "observaciones",
+        "horas_sistema_automatico",
         "horas_operadas", "consumo_lh", "volumen_m3", "rendimiento_mh",
         "costo_combustible", "costo_operador", "costo_total", "costo_hora",
         "costo_metro", "hrs_para_mantencion", "estado_mant", "creado_en",
@@ -228,6 +232,7 @@ def actualizar_registro(reg_id, data):
     cols = [
         "fecha", "turno", "operador", "poza", "horometro_inicial", "horometro_final",
         "combustible_l", "avance_m", "profundidad_cm", "observaciones",
+        "horas_sistema_automatico",
         "horas_operadas", "consumo_lh", "volumen_m3", "rendimiento_mh",
         "costo_combustible", "costo_operador", "costo_total", "costo_hora",
         "costo_metro", "hrs_para_mantencion", "estado_mant",
@@ -388,7 +393,8 @@ def resumen_kpis(anio=None, mes=None, poza=None):
             COALESCE(SUM(combustible_l), 0) AS combustible_total,
             COALESCE(SUM(avance_m), 0) AS avance_total,
             COALESCE(SUM(volumen_m3), 0) AS volumen_total,
-            COALESCE(SUM(costo_total), 0) AS costo_total_acumulado
+            COALESCE(SUM(costo_total), 0) AS costo_total_acumulado,
+            COALESCE(SUM(horas_sistema_automatico), 0) AS horas_sistema_automatico_total
         FROM registros {where}
     """, valores).fetchone()
     conn.close()
@@ -398,6 +404,11 @@ def resumen_kpis(anio=None, mes=None, poza=None):
     d["rendimiento_promedio"] = _safe_div(d["avance_total"], d["horas_operadas_total"]) or 0
     d["costo_por_hora"] = _safe_div(d["costo_total_acumulado"], d["horas_operadas_total"]) or 0
     d["costo_por_metro"] = _safe_div(d["costo_total_acumulado"], d["avance_total"]) or 0
+    d["utilizacion_automatico_pct"] = _safe_div(
+        d["horas_sistema_automatico_total"], d["horas_operadas_total"]
+    )
+    if d["utilizacion_automatico_pct"] is not None:
+        d["utilizacion_automatico_pct"] *= 100
     objetivo = params.get("consumo_objetivo") or 0
     d["desvio_consumo_pct"] = (
         _safe_div(d["consumo_promedio"] - objetivo, objetivo) if objetivo else None
