@@ -70,6 +70,7 @@ def init_db():
             observaciones TEXT,
             horas_sistema_automatico REAL,
             picas_reemplazadas REAL,
+            roturas_identificadas REAL,
             horas_operadas REAL,
             consumo_lh REAL,
             volumen_m3 REAL,
@@ -120,6 +121,8 @@ def init_db():
         conn.execute("ALTER TABLE registros ADD COLUMN horas_sistema_automatico REAL")
     if "picas_reemplazadas" not in cols_registros:
         conn.execute("ALTER TABLE registros ADD COLUMN picas_reemplazadas REAL")
+    if "roturas_identificadas" not in cols_registros:
+        conn.execute("ALTER TABLE registros ADD COLUMN roturas_identificadas REAL")
 
     row = conn.execute("SELECT COUNT(*) c FROM parametros").fetchone()
     if row["c"] == 0:
@@ -211,7 +214,7 @@ def crear_registro(data):
     cols = [
         "fecha", "turno", "operador", "poza", "horometro_inicial", "horometro_final",
         "combustible_l", "avance_m", "profundidad_cm", "observaciones",
-        "horas_sistema_automatico", "picas_reemplazadas",
+        "horas_sistema_automatico", "picas_reemplazadas", "roturas_identificadas",
         "horas_operadas", "consumo_lh", "volumen_m3", "rendimiento_mh",
         "costo_combustible", "costo_operador", "costo_total", "costo_hora",
         "costo_metro", "hrs_para_mantencion", "estado_mant", "creado_en",
@@ -235,7 +238,7 @@ def actualizar_registro(reg_id, data):
     cols = [
         "fecha", "turno", "operador", "poza", "horometro_inicial", "horometro_final",
         "combustible_l", "avance_m", "profundidad_cm", "observaciones",
-        "horas_sistema_automatico", "picas_reemplazadas",
+        "horas_sistema_automatico", "picas_reemplazadas", "roturas_identificadas",
         "horas_operadas", "consumo_lh", "volumen_m3", "rendimiento_mh",
         "costo_combustible", "costo_operador", "costo_total", "costo_hora",
         "costo_metro", "hrs_para_mantencion", "estado_mant",
@@ -346,6 +349,27 @@ def picas_reemplazadas_por_mes(anio=None, poza=None):
     return [dict(r) for r in rows]
 
 
+def roturas_identificadas_por_mes(anio=None, poza=None):
+    condiciones = []
+    valores = []
+    if anio:
+        condiciones.append("substr(fecha, 1, 4) = ?")
+        valores.append(f"{anio:04d}")
+    if poza:
+        condiciones.append("poza = ?")
+        valores.append(poza)
+    where = f"WHERE {' AND '.join(condiciones)}" if condiciones else ""
+    conn = get_db()
+    rows = conn.execute(f"""
+        SELECT substr(fecha, 1, 7) AS mes, COALESCE(SUM(roturas_identificadas), 0) AS total
+        FROM registros {where}
+        GROUP BY mes
+        ORDER BY mes DESC
+    """, valores).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
 def ultimo_horometro_final():
     conn = get_db()
     row = conn.execute(
@@ -428,7 +452,8 @@ def resumen_kpis(anio=None, mes=None, poza=None):
             COALESCE(SUM(volumen_m3), 0) AS volumen_total,
             COALESCE(SUM(costo_total), 0) AS costo_total_acumulado,
             COALESCE(SUM(horas_sistema_automatico), 0) AS horas_sistema_automatico_total,
-            COALESCE(SUM(picas_reemplazadas), 0) AS picas_reemplazadas_total
+            COALESCE(SUM(picas_reemplazadas), 0) AS picas_reemplazadas_total,
+            COALESCE(SUM(roturas_identificadas), 0) AS roturas_identificadas_total
         FROM registros {where}
     """, valores).fetchone()
     conn.close()

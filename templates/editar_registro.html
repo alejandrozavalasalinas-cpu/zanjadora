@@ -53,6 +53,9 @@
     <label>Reemplazo de picas (cantidad)
       <input type="number" step="1" min="0" name="picas_reemplazadas" value="{{ registro.picas_reemplazadas or 0 }}">
     </label>
+    <label>Identificación de roturas (cantidad)
+      <input type="number" step="1" min="0" name="roturas_identificadas" value="{{ registro.roturas_identificadas or 0 }}">
+    </label>
     <label class="span-2">Observaciones
       <textarea name="observaciones" rows="2" placeholder="Opcional">{{ registro.observaciones or '' }}</textarea>
     </label>

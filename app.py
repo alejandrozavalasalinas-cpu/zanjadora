@@ -114,6 +114,7 @@ def tablero():
             if meta_m3_poza:
                 avance_m3_poza_pct = (kpis["volumen_total"] / meta_m3_poza) * 100
     picas_por_mes = models.picas_reemplazadas_por_mes(anio=anio, poza=poza)
+    roturas_por_mes = models.roturas_identificadas_por_mes(anio=anio, poza=poza)
     return render_template(
         "tablero.html",
         kpis=kpis,
@@ -129,6 +130,7 @@ def tablero():
         meta_m3_poza=meta_m3_poza,
         avance_m3_poza_pct=avance_m3_poza_pct,
         picas_por_mes=picas_por_mes,
+        roturas_por_mes=roturas_por_mes,
     )
 
 
@@ -151,6 +153,7 @@ def formulario():
                 "observaciones": request.form.get("observaciones"),
                 "horas_sistema_automatico": float(request.form.get("horas_sistema_automatico") or 0),
                 "picas_reemplazadas": float(request.form.get("picas_reemplazadas") or 0),
+                "roturas_identificadas": float(request.form.get("roturas_identificadas") or 0),
             }
             if not data["fecha"]:
                 raise ValueError("La fecha es obligatoria.")
@@ -238,6 +241,7 @@ def editar_registro(reg_id):
                 "observaciones": request.form.get("observaciones"),
                 "horas_sistema_automatico": float(request.form.get("horas_sistema_automatico") or 0),
                 "picas_reemplazadas": float(request.form.get("picas_reemplazadas") or 0),
+                "roturas_identificadas": float(request.form.get("roturas_identificadas") or 0),
             }
             if not data["fecha"]:
                 raise ValueError("La fecha es obligatoria.")
