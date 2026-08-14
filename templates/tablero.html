@@ -203,15 +203,32 @@
   </div>
 </section>
 
-<section class="panel">
-  <h2>Mantención y disponibilidad</h2>
-  <p class="muted">Horas operadas por día (disponibilidad), coloreadas según el estado de mantención — verde: OK, rojo: en alerta. La línea muestra las horas restantes para la próxima mantención, con el umbral de aviso.</p>
-  <canvas id="chartMantencion" height="90"></canvas>
-</section>
-
-<section class="panel">
-  <h2>Evolución diaria</h2>
-  <canvas id="chartEvolucion" height="90"></canvas>
+<section class="chart-grid">
+  <div class="panel chart-card">
+    <div class="chart-card-head">
+      <h2>Disponibilidad diaria</h2>
+      <span class="chart-legend"><span class="dot dot-ok"></span>OK<span class="dot dot-alert"></span>Alerta</span>
+    </div>
+    <p class="muted">Horas operadas por día, coloreadas según el estado de mantención.</p>
+    <div class="chart-canvas-wrap"><canvas id="chartDisponibilidad"></canvas></div>
+  </div>
+  <div class="panel chart-card">
+    <h2>Mantención — horas restantes</h2>
+    <p class="muted">Horas para la próxima mantención, con el umbral de aviso.</p>
+    <div class="chart-canvas-wrap"><canvas id="chartMantencion"></canvas></div>
+  </div>
+  <div class="panel chart-card">
+    <h2>Costo diario</h2>
+    <div class="chart-canvas-wrap"><canvas id="chartCosto"></canvas></div>
+  </div>
+  <div class="panel chart-card">
+    <h2>Avance diario</h2>
+    <div class="chart-canvas-wrap"><canvas id="chartAvance"></canvas></div>
+  </div>
+  <div class="panel chart-card">
+    <h2>Combustible diario</h2>
+    <div class="chart-canvas-wrap"><canvas id="chartCombustible"></canvas></div>
+  </div>
 </section>
 
 <section class="panel">

@@ -1,3 +1,39 @@
+const COLOR_OK = '#2f6f4f';
+const COLOR_ALERT = '#b3492c';
+const COLOR_COSTO = '#b5760f';
+const COLOR_AVANCE = '#2a6fdb';
+const COLOR_COMBUSTIBLE = '#00968f';
+const COLOR_MANTENCION = '#6a4fb3';
+
+function lineOptions(axisLabel) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { title: { display: true, text: axisLabel }, grid: { color: '#eef0f3' } },
+      x: { grid: { display: false } },
+    },
+  };
+}
+
+function lineDataset(label, data, color) {
+  return {
+    label,
+    data,
+    borderColor: color,
+    backgroundColor: color + '1a',
+    borderWidth: 2,
+    pointRadius: 3,
+    pointBackgroundColor: color,
+    pointBorderColor: '#fff',
+    pointBorderWidth: 1.5,
+    tension: 0.3,
+    fill: true,
+  };
+}
+
 async function cargarGraficos() {
   const filtro = window.FILTRO_PERIODO || {};
   const qs = new URLSearchParams();
@@ -9,108 +45,78 @@ async function cargarGraficos() {
   const ordenado = [...data].sort((a, b) => a.fecha.localeCompare(b.fecha));
   const labels = ordenado.map(r => r.fecha);
 
-  const ctxMantencion = document.getElementById('chartMantencion');
-  if (ctxMantencion) {
+  const ctxDisponibilidad = document.getElementById('chartDisponibilidad');
+  if (ctxDisponibilidad) {
     const horasOperadas = ordenado.map(r => r.horas_operadas);
-    const horasParaMantencion = ordenado.map(r => r.hrs_para_mantencion);
-    const coloresDisponibilidad = ordenado.map(r =>
-      r.estado_mant === 'Alerta' ? '#b3492c' : '#2f6f4f'
-    );
-    const umbralAviso = window.AVISO_ANTICIPADO || 0;
-    const umbral = ordenado.map(() => umbralAviso);
-
-    new Chart(ctxMantencion, {
+    const colores = ordenado.map(r => r.estado_mant === 'Alerta' ? COLOR_ALERT : COLOR_OK);
+    new Chart(ctxDisponibilidad, {
+      type: 'bar',
       data: {
         labels,
-        datasets: [
-          {
-            type: 'bar',
-            label: 'Horas operadas (disponibilidad)',
-            data: horasOperadas,
-            backgroundColor: coloresDisponibilidad,
-            yAxisID: 'y',
-          },
-          {
-            type: 'line',
-            label: 'Horas para próxima mantención',
-            data: horasParaMantencion,
-            borderColor: '#3b6f8a',
-            backgroundColor: 'rgba(59,111,138,0.06)',
-            yAxisID: 'y1',
-            tension: 0.25,
-          },
-          {
-            type: 'line',
-            label: 'Umbral de aviso',
-            data: umbral,
-            borderColor: '#b3492c',
-            borderDash: [6, 4],
-            borderWidth: 1.5,
-            pointRadius: 0,
-            yAxisID: 'y1',
-          },
-        ],
+        datasets: [{
+          label: 'Horas operadas',
+          data: horasOperadas,
+          backgroundColor: colores,
+          borderRadius: 4,
+          maxBarThickness: 24,
+        }],
       },
-      options: {
-        responsive: true,
-        interaction: { mode: 'index', intersect: false },
-        scales: {
-          y: { position: 'left', title: { display: true, text: 'h operadas' } },
-          y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'h para mantención' } },
-        },
-        plugins: { legend: { position: 'bottom' } },
-      },
+      options: lineOptions('h operadas'),
     });
   }
 
-  const ctxEvolucion = document.getElementById('chartEvolucion');
-  if (ctxEvolucion) {
-    const costo = ordenado.map(r => r.costo_total);
-    const combustible = ordenado.map(r => r.combustible_l);
-    const avance = ordenado.map(r => r.avance_m);
-
-    new Chart(ctxEvolucion, {
+  const ctxMantencion = document.getElementById('chartMantencion');
+  if (ctxMantencion) {
+    const horasParaMantencion = ordenado.map(r => r.hrs_para_mantencion);
+    const umbral = ordenado.map(() => window.AVISO_ANTICIPADO || 0);
+    new Chart(ctxMantencion, {
       type: 'line',
       data: {
         labels,
         datasets: [
+          lineDataset('Horas para mantención', horasParaMantencion, COLOR_MANTENCION),
           {
-            label: 'Costo total ($)',
-            data: costo,
-            borderColor: '#2f6f4f',
-            backgroundColor: 'rgba(47,111,79,0.08)',
-            yAxisID: 'y',
-            tension: 0.25,
-            fill: true,
-          },
-          {
-            label: 'Avance (m lineal)',
-            data: avance,
-            borderColor: '#8a6d3b',
-            backgroundColor: 'rgba(138,109,59,0.06)',
-            yAxisID: 'y1',
-            tension: 0.25,
-          },
-          {
-            label: 'Combustible (L)',
-            data: combustible,
-            borderColor: '#3b6f8a',
-            backgroundColor: 'rgba(59,111,138,0.06)',
-            yAxisID: 'y2',
-            tension: 0.25,
+            label: 'Umbral de aviso',
+            data: umbral,
+            borderColor: COLOR_ALERT,
+            borderDash: [6, 4],
+            borderWidth: 1.5,
+            pointRadius: 0,
+            fill: false,
           },
         ],
       },
-      options: {
-        responsive: true,
-        interaction: { mode: 'index', intersect: false },
-        scales: {
-          y: { position: 'left', title: { display: true, text: '$' } },
-          y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'm lineal' } },
-          y2: { position: 'right', offset: true, grid: { drawOnChartArea: false }, title: { display: true, text: 'L' } },
-        },
-        plugins: { legend: { position: 'bottom' } },
-      },
+      options: lineOptions('h restantes'),
+    });
+  }
+
+  const ctxCosto = document.getElementById('chartCosto');
+  if (ctxCosto) {
+    const costo = ordenado.map(r => r.costo_total);
+    new Chart(ctxCosto, {
+      type: 'line',
+      data: { labels, datasets: [lineDataset('Costo total', costo, COLOR_COSTO)] },
+      options: lineOptions('$'),
+    });
+  }
+
+  const ctxAvance = document.getElementById('chartAvance');
+  if (ctxAvance) {
+    const avance = ordenado.map(r => r.avance_m);
+    new Chart(ctxAvance, {
+      type: 'line',
+      data: { labels, datasets: [lineDataset('Avance', avance, COLOR_AVANCE)] },
+      options: lineOptions('m lineal'),
+    });
+  }
+
+  const ctxCombustible = document.getElementById('chartCombustible');
+  if (ctxCombustible) {
+    const combustible = ordenado.map(r => r.combustible_l);
+    new Chart(ctxCombustible, {
+      type: 'line',
+      data: { labels, datasets: [lineDataset('Combustible', combustible, COLOR_COMBUSTIBLE)] },
+      options: lineOptions('L'),
     });
   }
 }
