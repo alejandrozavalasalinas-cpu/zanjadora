@@ -217,10 +217,12 @@
     <p class="muted">Horas para la próxima mantención, con el umbral de aviso.</p>
     <div class="chart-canvas-wrap"><canvas id="chartMantencion"></canvas></div>
   </div>
+  {% if session.get('rol') != 'visor' %}
   <div class="panel chart-card">
     <h2>Costo diario</h2>
     <div class="chart-canvas-wrap"><canvas id="chartCosto"></canvas></div>
   </div>
+  {% endif %}
   <div class="panel chart-card">
     <h2>Avance diario</h2>
     <div class="chart-canvas-wrap"><canvas id="chartAvance"></canvas></div>
