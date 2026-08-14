@@ -35,13 +35,13 @@ def login():
         nombre = (request.form.get("nombre") or "").strip()
         password = request.form.get("password") or ""
         usuario = models.verificar_usuario(nombre, password)
-        if usuario or (password == APP_PASSWORD and password):
+        if usuario:
             session["autenticado"] = True
-            session["usuario"] = usuario["nombre"] if usuario else (nombre or "Operador")
+            session["usuario"] = usuario["nombre"]
             models.registrar_acceso(session["usuario"])
             destino = request.args.get("next") or url_for("tablero")
             return redirect(destino)
-        error = "Nombre o contraseña incorrectos."
+        error = "Usuario o contraseña incorrectos."
     return render_template("login.html", error=error)
 
 
