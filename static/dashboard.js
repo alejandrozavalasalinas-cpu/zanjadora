@@ -38,6 +38,14 @@ async function cargarGrafico() {
           yAxisID: 'y1',
           tension: 0.25,
         },
+        {
+          label: 'Combustible (L)',
+          data: combustible,
+          borderColor: '#3b6f8a',
+          backgroundColor: 'rgba(59,111,138,0.06)',
+          yAxisID: 'y2',
+          tension: 0.25,
+        },
       ],
     },
     options: {
@@ -46,6 +54,7 @@ async function cargarGrafico() {
       scales: {
         y: { position: 'left', title: { display: true, text: '$' } },
         y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'm lineal' } },
+        y2: { position: 'right', offset: true, grid: { drawOnChartArea: false }, title: { display: true, text: 'L' } },
       },
       plugins: { legend: { position: 'bottom' } },
     },
