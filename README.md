@@ -38,6 +38,8 @@ Los datos (`zanjadora.db`) se guardan en un archivo. Fly.io permite un volumen p
 6. Despliega: `fly deploy`
 7. Tu app queda en `https://<nombre-que-elegiste>.fly.dev` — ese es el link que compartes con los operadores.
 
+Desde entonces, cada `git push` a `main` dispara un deploy automático vía GitHub Actions (`.github/workflows/fly-deploy.yml`), usando el secreto `FLY_API_TOKEN` configurado en el repo.
+
 ### Alternativa: Render.com (más simple de clickear, pero el disco persistente requiere plan pago desde ~USD 7/mes)
 
 1. Sube esta carpeta a un repositorio de GitHub.
