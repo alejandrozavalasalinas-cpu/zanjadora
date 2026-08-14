@@ -204,8 +204,9 @@
 </section>
 
 <section class="panel">
-  <h2>Evolución diaria</h2>
-  <canvas id="chartEvolucion" height="90"></canvas>
+  <h2>Mantención y disponibilidad</h2>
+  <p class="muted">Horas operadas por día (disponibilidad), coloreadas según el estado de mantención — verde: OK, rojo: en alerta. La línea muestra las horas restantes para la próxima mantención, con el umbral de aviso.</p>
+  <canvas id="chartMantencion" height="90"></canvas>
 </section>
 
 <section class="panel">
@@ -250,6 +251,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script>
   window.FILTRO_PERIODO = { anio: {{ anio_sel or 'null' }}, mes: {{ mes_sel or 'null' }}, poza: {{ poza_sel|tojson if poza_sel else 'null' }} };
+  window.AVISO_ANTICIPADO = {{ aviso_anticipado or 0 }};
 </script>
 <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 {% endblock %}

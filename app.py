@@ -148,6 +148,7 @@ def tablero():
         avance_m3_poza_pct=avance_m3_poza_pct,
         picas_por_mes=picas_por_mes,
         roturas_por_mes=roturas_por_mes,
+        aviso_anticipado=models.get_parametros().get("aviso_anticipado") or 0,
     )
 
 
