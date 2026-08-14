@@ -47,33 +47,43 @@
 </form>
 
 {% if poza_sel %}
+<section class="panel poza-progreso">
+  <h2>Avance en {{ poza_sel }}</h2>
   {% if avance_poza_pct is not none %}
-  <section class="panel poza-progreso">
-    <h2>Avance en {{ poza_sel }}</h2>
-    <div class="poza-progreso-item">
-      <div class="poza-progreso-head">
-        <span>Metros lineales</span>
-        <span class="poza-progreso-pct">{{ "%.1f"|format(avance_poza_pct) }}%</span>
-      </div>
-      <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [avance_poza_pct, 100] | min }}%"></div></div>
-      <p class="muted">{{ "{:,.0f}".format(kpis.avance_total) }} m de {{ "{:,.0f}".format(metros_totales_poza) }} m totales</p>
+  <div class="poza-progreso-item">
+    <div class="poza-progreso-head">
+      <span>Metros lineales</span>
+      <span class="poza-progreso-pct">{{ "%.1f"|format(avance_poza_pct) }}%</span>
     </div>
-    {% if avance_m3_poza_pct is not none %}
-    <div class="poza-progreso-item">
-      <div class="poza-progreso-head">
-        <span>Volumen (m³)</span>
-        <span class="poza-progreso-pct">{{ "%.1f"|format(avance_m3_poza_pct) }}%</span>
-      </div>
-      <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [avance_m3_poza_pct, 100] | min }}%"></div></div>
-      <p class="muted">{{ "{:,.0f}".format(kpis.volumen_total) }} m³ de {{ "{:,.0f}".format(meta_m3_poza) }} m³ totales</p>
+    <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [avance_poza_pct, 100] | min }}%"></div></div>
+    <p class="muted">{{ "{:,.0f}".format(kpis.avance_total) }} m de {{ "{:,.0f}".format(metros_totales_poza) }} m totales</p>
+  </div>
+  {% if avance_m3_poza_pct is not none %}
+  <div class="poza-progreso-item">
+    <div class="poza-progreso-head">
+      <span>Volumen (m³)</span>
+      <span class="poza-progreso-pct">{{ "%.1f"|format(avance_m3_poza_pct) }}%</span>
     </div>
-    {% else %}
-    <p class="muted">Falta la altura de corte de esta poza (o el ancho de zanja en Parámetros) para calcular el avance en m³.</p>
-    {% endif %}
-  </section>
+    <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [avance_m3_poza_pct, 100] | min }}%"></div></div>
+    <p class="muted">{{ "{:,.0f}".format(kpis.volumen_total) }} m³ de {{ "{:,.0f}".format(meta_m3_poza) }} m³ totales</p>
+  </div>
+  {% else %}
+  <p class="muted">Falta la altura de corte de esta poza (o el ancho de zanja en Parámetros) para calcular el avance en m³.</p>
+  {% endif %}
   {% else %}
   <p class="muted">Esta poza no tiene metros totales definidos — agrégalos en <a href="{{ url_for('parametros') }}">Parámetros</a> para ver el % de avance.</p>
   {% endif %}
+  {% if kpis.utilizacion_automatico_pct is not none %}
+  <div class="poza-progreso-item">
+    <div class="poza-progreso-head">
+      <span>Utilización sistema automático</span>
+      <span class="poza-progreso-pct">{{ "%.1f"|format(kpis.utilizacion_automatico_pct) }}%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [kpis.utilizacion_automatico_pct, 100] | min }}%"></div></div>
+    <p class="muted">{{ "%.1f"|format(kpis.horas_sistema_automatico_total) }} h de {{ "%.1f"|format(kpis.horas_operadas_total) }} h operadas</p>
+  </div>
+  {% endif %}
+</section>
 {% endif %}
 
 <section class="kpi-grid">
