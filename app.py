@@ -97,20 +97,24 @@ def tablero():
     registros = models.listar_registros(limit=200, anio=anio, mes=mes, poza=poza)
     anios_disponibles = models.listar_anios_disponibles()
     pozas_disponibles = models.listar_pozas_disponibles()
-    avance_poza_pct = None
-    metros_totales_poza = None
+    avance_perimetral_pct = None
+    avance_transversal_pct = None
+    metros_perimetral_totales_poza = None
+    metros_transversal_totales_poza = None
     meta_m3_poza = None
     avance_m3_poza_pct = None
     if poza:
         poza_info = models.obtener_poza(poza)
-        if poza_info and poza_info.get("metros_totales"):
-            metros_totales_poza = poza_info["metros_totales"]
-            avance_poza_pct = (kpis["avance_total"] / metros_totales_poza) * 100
-        if poza_info and poza_info.get("metros_totales") and poza_info.get("altura_cm"):
+        if poza_info and poza_info.get("metros_perimetral_totales"):
+            metros_perimetral_totales_poza = poza_info["metros_perimetral_totales"]
+            avance_perimetral_pct = (kpis["avance_perimetral_total"] / metros_perimetral_totales_poza) * 100
+        if poza_info and poza_info.get("metros_transversal_totales"):
+            metros_transversal_totales_poza = poza_info["metros_transversal_totales"]
+            avance_transversal_pct = (kpis["avance_transversal_total"] / metros_transversal_totales_poza) * 100
+        metros_totales_poza = (poza_info.get("metros_perimetral_totales") or 0) + (poza_info.get("metros_transversal_totales") or 0) if poza_info else 0
+        if poza_info and metros_totales_poza and poza_info.get("altura_cm"):
             ancho_zanja_cm = models.get_parametros().get("ancho_zanja_cm") or 0
-            meta_m3_poza = (
-                poza_info["metros_totales"] * (poza_info["altura_cm"] / 100) * (ancho_zanja_cm / 100)
-            )
+            meta_m3_poza = metros_totales_poza * (poza_info["altura_cm"] / 100) * (ancho_zanja_cm / 100)
             if meta_m3_poza:
                 avance_m3_poza_pct = (kpis["volumen_total"] / meta_m3_poza) * 100
     picas_por_mes = models.picas_reemplazadas_por_mes(anio=anio, poza=poza)
@@ -125,8 +129,10 @@ def tablero():
         anio_sel=anio,
         mes_sel=mes,
         poza_sel=poza,
-        avance_poza_pct=avance_poza_pct,
-        metros_totales_poza=metros_totales_poza,
+        avance_perimetral_pct=avance_perimetral_pct,
+        avance_transversal_pct=avance_transversal_pct,
+        metros_perimetral_totales_poza=metros_perimetral_totales_poza,
+        metros_transversal_totales_poza=metros_transversal_totales_poza,
         meta_m3_poza=meta_m3_poza,
         avance_m3_poza_pct=avance_m3_poza_pct,
         picas_por_mes=picas_por_mes,
@@ -148,13 +154,15 @@ def formulario():
                 "horometro_inicial": float(request.form.get("horometro_inicial") or 0),
                 "horometro_final": float(request.form.get("horometro_final") or 0),
                 "combustible_l": float(request.form.get("combustible_l") or 0),
-                "avance_m": float(request.form.get("avance_m") or 0),
+                "avance_perimetral_m": float(request.form.get("avance_perimetral_m") or 0),
+                "avance_transversal_m": float(request.form.get("avance_transversal_m") or 0),
                 "profundidad_cm": float(request.form.get("profundidad_cm") or params.get("profundidad_zanja_cm") or 0),
                 "observaciones": request.form.get("observaciones"),
                 "horas_sistema_automatico": float(request.form.get("horas_sistema_automatico") or 0),
                 "picas_reemplazadas": float(request.form.get("picas_reemplazadas") or 0),
                 "roturas_identificadas": float(request.form.get("roturas_identificadas") or 0),
             }
+            data["avance_m"] = data["avance_perimetral_m"] + data["avance_transversal_m"]
             if not data["fecha"]:
                 raise ValueError("La fecha es obligatoria.")
             if not data["poza"]:
@@ -236,13 +244,15 @@ def editar_registro(reg_id):
                 "horometro_inicial": float(request.form.get("horometro_inicial") or 0),
                 "horometro_final": float(request.form.get("horometro_final") or 0),
                 "combustible_l": float(request.form.get("combustible_l") or 0),
-                "avance_m": float(request.form.get("avance_m") or 0),
+                "avance_perimetral_m": float(request.form.get("avance_perimetral_m") or 0),
+                "avance_transversal_m": float(request.form.get("avance_transversal_m") or 0),
                 "profundidad_cm": float(request.form.get("profundidad_cm") or params.get("profundidad_zanja_cm") or 0),
                 "observaciones": request.form.get("observaciones"),
                 "horas_sistema_automatico": float(request.form.get("horas_sistema_automatico") or 0),
                 "picas_reemplazadas": float(request.form.get("picas_reemplazadas") or 0),
                 "roturas_identificadas": float(request.form.get("roturas_identificadas") or 0),
             }
+            data["avance_m"] = data["avance_perimetral_m"] + data["avance_transversal_m"]
             if not data["fecha"]:
                 raise ValueError("La fecha es obligatoria.")
             if not data["poza"]:
@@ -307,11 +317,12 @@ def parametros():
 def crear_poza():
     nombre = (request.form.get("nombre") or "").strip()
     try:
-        metros_totales = float(request.form.get("metros_totales") or 0)
+        metros_perimetral_totales = float(request.form.get("metros_perimetral_totales") or 0)
+        metros_transversal_totales = float(request.form.get("metros_transversal_totales") or 0)
         altura_cm = float(request.form.get("altura_cm") or 0)
         if not nombre:
             raise ValueError("El nombre de la poza es obligatorio.")
-        models.crear_poza(nombre, metros_totales, altura_cm)
+        models.crear_poza(nombre, metros_perimetral_totales, metros_transversal_totales, altura_cm)
         flash("Poza agregada.", "success")
     except ValueError as e:
         flash(f"Error: {e}", "error")

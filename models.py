@@ -66,6 +66,8 @@ def init_db():
             horometro_final REAL,
             combustible_l REAL,
             avance_m REAL,
+            avance_perimetral_m REAL,
+            avance_transversal_m REAL,
             profundidad_cm REAL,
             observaciones TEXT,
             horas_sistema_automatico REAL,
@@ -106,6 +108,8 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT UNIQUE NOT NULL,
             metros_totales REAL,
+            metros_perimetral_totales REAL,
+            metros_transversal_totales REAL,
             altura_cm REAL,
             creado_en TEXT
         )
@@ -113,6 +117,10 @@ def init_db():
     cols_pozas = [r["name"] for r in conn.execute("PRAGMA table_info(pozas)").fetchall()]
     if "altura_cm" not in cols_pozas:
         conn.execute("ALTER TABLE pozas ADD COLUMN altura_cm REAL")
+    if "metros_perimetral_totales" not in cols_pozas:
+        conn.execute("ALTER TABLE pozas ADD COLUMN metros_perimetral_totales REAL")
+    if "metros_transversal_totales" not in cols_pozas:
+        conn.execute("ALTER TABLE pozas ADD COLUMN metros_transversal_totales REAL")
 
     cols_registros = [r["name"] for r in conn.execute("PRAGMA table_info(registros)").fetchall()]
     if "poza" not in cols_registros:
@@ -123,6 +131,10 @@ def init_db():
         conn.execute("ALTER TABLE registros ADD COLUMN picas_reemplazadas REAL")
     if "roturas_identificadas" not in cols_registros:
         conn.execute("ALTER TABLE registros ADD COLUMN roturas_identificadas REAL")
+    if "avance_perimetral_m" not in cols_registros:
+        conn.execute("ALTER TABLE registros ADD COLUMN avance_perimetral_m REAL")
+    if "avance_transversal_m" not in cols_registros:
+        conn.execute("ALTER TABLE registros ADD COLUMN avance_transversal_m REAL")
 
     row = conn.execute("SELECT COUNT(*) c FROM parametros").fetchone()
     if row["c"] == 0:
@@ -213,7 +225,7 @@ def crear_registro(data):
     conn = get_db()
     cols = [
         "fecha", "turno", "operador", "poza", "horometro_inicial", "horometro_final",
-        "combustible_l", "avance_m", "profundidad_cm", "observaciones",
+        "combustible_l", "avance_m", "avance_perimetral_m", "avance_transversal_m", "profundidad_cm", "observaciones",
         "horas_sistema_automatico", "picas_reemplazadas", "roturas_identificadas",
         "horas_operadas", "consumo_lh", "volumen_m3", "rendimiento_mh",
         "costo_combustible", "costo_operador", "costo_total", "costo_hora",
@@ -237,7 +249,7 @@ def actualizar_registro(reg_id, data):
     conn = get_db()
     cols = [
         "fecha", "turno", "operador", "poza", "horometro_inicial", "horometro_final",
-        "combustible_l", "avance_m", "profundidad_cm", "observaciones",
+        "combustible_l", "avance_m", "avance_perimetral_m", "avance_transversal_m", "profundidad_cm", "observaciones",
         "horas_sistema_automatico", "picas_reemplazadas", "roturas_identificadas",
         "horas_operadas", "consumo_lh", "volumen_m3", "rendimiento_mh",
         "costo_combustible", "costo_operador", "costo_total", "costo_hora",
@@ -289,12 +301,14 @@ def listar_anios_disponibles():
     return [int(r["anio"]) for r in rows if r["anio"]]
 
 
-def crear_poza(nombre, metros_totales, altura_cm):
+def crear_poza(nombre, metros_perimetral_totales, metros_transversal_totales, altura_cm):
     conn = get_db()
     try:
         conn.execute(
-            "INSERT INTO pozas (nombre, metros_totales, altura_cm, creado_en) VALUES (?, ?, ?, ?)",
-            (nombre, metros_totales, altura_cm, datetime.utcnow().isoformat()),
+            """INSERT INTO pozas
+               (nombre, metros_perimetral_totales, metros_transversal_totales, altura_cm, creado_en)
+               VALUES (?, ?, ?, ?, ?)""",
+            (nombre, metros_perimetral_totales, metros_transversal_totales, altura_cm, datetime.utcnow().isoformat()),
         )
         conn.commit()
     except sqlite3.IntegrityError:
@@ -449,6 +463,8 @@ def resumen_kpis(anio=None, mes=None, poza=None):
             COALESCE(SUM(horas_operadas), 0) AS horas_operadas_total,
             COALESCE(SUM(combustible_l), 0) AS combustible_total,
             COALESCE(SUM(avance_m), 0) AS avance_total,
+            COALESCE(SUM(avance_perimetral_m), 0) AS avance_perimetral_total,
+            COALESCE(SUM(avance_transversal_m), 0) AS avance_transversal_total,
             COALESCE(SUM(volumen_m3), 0) AS volumen_total,
             COALESCE(SUM(costo_total), 0) AS costo_total_acumulado,
             COALESCE(SUM(horas_sistema_automatico), 0) AS horas_sistema_automatico_total,

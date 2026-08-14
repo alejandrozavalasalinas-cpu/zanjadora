@@ -49,15 +49,27 @@
 {% if poza_sel %}
 <section class="panel poza-progreso">
   <h2>Avance en {{ poza_sel }}</h2>
-  {% if avance_poza_pct is not none %}
+  {% if avance_perimetral_pct is not none or avance_transversal_pct is not none %}
+  {% if avance_perimetral_pct is not none %}
   <div class="poza-progreso-item">
     <div class="poza-progreso-head">
-      <span>Metros lineales</span>
-      <span class="poza-progreso-pct">{{ "%.1f"|format(avance_poza_pct) }}%</span>
+      <span>Metros perimetral</span>
+      <span class="poza-progreso-pct">{{ "%.1f"|format(avance_perimetral_pct) }}%</span>
     </div>
-    <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [avance_poza_pct, 100] | min }}%"></div></div>
-    <p class="muted">{{ "{:,.0f}".format(kpis.avance_total) }} m de {{ "{:,.0f}".format(metros_totales_poza) }} m totales</p>
+    <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [avance_perimetral_pct, 100] | min }}%"></div></div>
+    <p class="muted">{{ "{:,.0f}".format(kpis.avance_perimetral_total) }} m de {{ "{:,.0f}".format(metros_perimetral_totales_poza) }} m totales</p>
   </div>
+  {% endif %}
+  {% if avance_transversal_pct is not none %}
+  <div class="poza-progreso-item">
+    <div class="poza-progreso-head">
+      <span>Metros transversal</span>
+      <span class="poza-progreso-pct">{{ "%.1f"|format(avance_transversal_pct) }}%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [avance_transversal_pct, 100] | min }}%"></div></div>
+    <p class="muted">{{ "{:,.0f}".format(kpis.avance_transversal_total) }} m de {{ "{:,.0f}".format(metros_transversal_totales_poza) }} m totales</p>
+  </div>
+  {% endif %}
   {% if avance_m3_poza_pct is not none %}
   <div class="poza-progreso-item">
     <div class="poza-progreso-head">
@@ -71,7 +83,7 @@
   <p class="muted">Falta la altura de corte de esta poza (o el ancho de zanja en Parámetros) para calcular el avance en m³.</p>
   {% endif %}
   {% else %}
-  <p class="muted">Esta poza no tiene metros totales definidos — agrégalos en <a href="{{ url_for('parametros') }}">Parámetros</a> para ver el % de avance.</p>
+  <p class="muted">Esta poza no tiene metros perimetral/transversal totales definidos — agrégalos en <a href="{{ url_for('parametros') }}">Parámetros</a> para ver el % de avance.</p>
   {% endif %}
   {% if kpis.utilizacion_automatico_pct is not none %}
   <div class="poza-progreso-item">
