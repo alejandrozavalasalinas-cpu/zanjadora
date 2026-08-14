@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Tablero{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <h1>Resumen e indicadores</h1>
+    <p class="muted">MAQ-001 — Zanjadora · {{ kpis.registros_ingresados }} registro(s) ingresados</p>
+  </div>
+  <a class="btn-primary" href="{{ url_for('formulario') }}">+ Nuevo registro</a>
+</div>
+
+<section class="kpi-grid">
+  <div class="kpi-card">
+    <span class="kpi-label">Horas operadas (total)</span>
+    <span class="kpi-value">{{ "%.1f"|format(kpis.horas_operadas_total) }} h</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Combustible total</span>
+    <span class="kpi-value">{{ "%.0f"|format(kpis.combustible_total) }} L</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Consumo promedio</span>
+    <span class="kpi-value">{{ "%.2f"|format(kpis.consumo_promedio) }} L/h</span>
+  </div>
+  <div class="kpi-card {{ 'kpi-alert' if kpis.desvio_consumo_pct and kpis.desvio_consumo_pct > 0 else '' }}">
+    <span class="kpi-label">Desvío vs objetivo consumo</span>
+    <span class="kpi-value">
+      {% if kpis.desvio_consumo_pct is not none %}
+        {{ "%+.1f"|format(kpis.desvio_consumo_pct * 100) }}%
+      {% else %}—{% endif %}
+    </span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Avance total</span>
+    <span class="kpi-value">{{ "%.0f"|format(kpis.avance_total) }} m</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Rendimiento promedio</span>
+    <span class="kpi-value">{{ "%.2f"|format(kpis.rendimiento_promedio) }} m/h</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Costo total acumulado</span>
+    <span class="kpi-value">${{ "{:,.0f}".format(kpis.costo_total_acumulado) }}</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Costo por hora</span>
+    <span class="kpi-value">${{ "{:,.0f}".format(kpis.costo_por_hora) }}</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Costo por metro</span>
+    <span class="kpi-value">${{ "{:,.0f}".format(kpis.costo_por_metro) }}</span>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Evolución diaria</h2>
+  <canvas id="chartEvolucion" height="90"></canvas>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Registro diario</h2>
+    <a class="btn-secondary" href="{{ url_for('formulario') }}">Ver / editar en el formulario</a>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Turno</th><th>Operador</th><th>Horas</th>
+          <th>Combustible (L)</th><th>Avance (m)</th><th>Rendim. (m/h)</th>
+          <th>Costo total</th><th>Estado mant.</th><th>Observaciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in registros %}
+        <tr>
+          <td>{{ r.fecha }}</td>
+          <td>{{ r.turno or '—' }}</td>
+          <td>{{ r.operador or '—' }}</td>
+          <td>{{ "%.1f"|format(r.horas_operadas) if r.horas_operadas is not none else '—' }}</td>
+          <td>{{ "%.0f"|format(r.combustible_l) if r.combustible_l is not none else '—' }}</td>
+          <td>{{ "%.0f"|format(r.avance_m) if r.avance_m is not none else '—' }}</td>
+          <td>{{ "%.2f"|format(r.rendimiento_mh) if r.rendimiento_mh is not none else '—' }}</td>
+          <td>${{ "{:,.0f}".format(r.costo_total) if r.costo_total is not none else '—' }}</td>
+          <td><span class="badge {{ 'badge-alert' if r.estado_mant == 'Alerta' else 'badge-ok' }}">{{ r.estado_mant or '—' }}</span></td>
+          <td class="obs">{{ r.observaciones or '' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="10" class="empty">Todavía no hay registros. <a href="{{ url_for('formulario') }}">Ingresa el primero</a>.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}

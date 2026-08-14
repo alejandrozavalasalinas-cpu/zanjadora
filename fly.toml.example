@@ -1,0 +1,20 @@
+# Renombra este archivo a "fly.toml" después de correr "fly launch" (o úsalo como referencia).
+app = "control-zanjadora"          # cambia por un nombre único
+primary_region = "scl"             # Santiago, Chile
+
+[build]
+
+[env]
+  PORT = "8080"
+  DB_PATH = "/data/zanjadora.db"
+
+[[mounts]]
+  source = "zanjadora_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1

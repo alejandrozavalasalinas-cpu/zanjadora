@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Parámetros{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <h1>Parámetros del equipo</h1>
+    <p class="muted">Estos valores se usan para calcular costos, consumo y mantención en cada registro.</p>
+  </div>
+</div>
+
+<section class="panel form-panel">
+  <form method="post" class="grid-form">
+    <h2 class="span-2">Identificación</h2>
+    <label>Código interno
+      <input type="text" name="codigo_interno" value="{{ params.codigo_interno }}">
+    </label>
+    <label>Nombre / descripción
+      <input type="text" name="nombre" value="{{ params.nombre }}">
+    </label>
+    <label>Marca
+      <input type="text" name="marca" value="{{ params.marca }}">
+    </label>
+    <label>Modelo
+      <input type="text" name="modelo" value="{{ params.modelo }}">
+    </label>
+    <label>Año
+      <input type="number" name="anio" value="{{ params.anio }}">
+    </label>
+    <label>N° de serie
+      <input type="text" name="numero_serie" value="{{ params.numero_serie }}">
+    </label>
+
+    <h2 class="span-2">Supuestos de costo y operación</h2>
+    <label>Precio combustible ($/L)
+      <input type="number" step="0.01" name="precio_combustible" value="{{ params.precio_combustible }}">
+    </label>
+    <label>Costo operador ($/h)
+      <input type="number" step="0.01" name="costo_operador_hora" value="{{ params.costo_operador_hora }}">
+    </label>
+    <label>Consumo objetivo (L/h)
+      <input type="number" step="0.01" name="consumo_objetivo" value="{{ params.consumo_objetivo }}">
+    </label>
+    <label>Rendimiento objetivo (m lineal/h)
+      <input type="number" step="0.01" name="rendimiento_objetivo" value="{{ params.rendimiento_objetivo }}">
+    </label>
+
+    <h2 class="span-2">Mantención</h2>
+    <label>Intervalo de mantención (h)
+      <input type="number" step="0.1" name="intervalo_mantencion" value="{{ params.intervalo_mantencion }}">
+    </label>
+    <label>Horómetro de última mantención (h)
+      <input type="number" step="0.1" name="horometro_ultima_mantencion" value="{{ params.horometro_ultima_mantencion }}">
+    </label>
+    <label>Aviso anticipado (h antes)
+      <input type="number" step="0.1" name="aviso_anticipado" value="{{ params.aviso_anticipado }}">
+    </label>
+
+    <h2 class="span-2">Geometría de zanja (para volumen excavado)</h2>
+    <label>Profundidad de zanja por defecto (cm)
+      <input type="number" step="0.1" name="profundidad_zanja_cm" value="{{ params.profundidad_zanja_cm }}">
+    </label>
+    <label>Ancho de zanja (cm)
+      <input type="number" step="0.1" name="ancho_zanja_cm" value="{{ params.ancho_zanja_cm }}">
+    </label>
+
+    <div class="span-2 form-actions">
+      <button type="submit" class="btn-primary">Guardar parámetros</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

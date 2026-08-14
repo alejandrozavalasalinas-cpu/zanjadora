@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Nuevo registro{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <h1>Registro diario de operación</h1>
+    <p class="muted">MAQ-001 — Zanjadora (Tesmec Tesmec 975 CS)</p>
+  </div>
+</div>
+
+<section class="panel form-panel">
+  <form method="post" class="grid-form">
+    <label>Fecha
+      <input type="date" name="fecha" value="{{ hoy }}" required>
+    </label>
+    <label>Turno
+      <select name="turno">
+        <option value="Día">Día</option>
+        <option value="Tarde">Tarde</option>
+        <option value="Noche">Noche</option>
+      </select>
+    </label>
+    <label>Operador
+      <input type="text" name="operador" placeholder="Nombre del operador" required>
+    </label>
+    <label>Horómetro inicial (h)
+      <input type="number" step="0.1" name="horometro_inicial" required>
+    </label>
+    <label>Horómetro final (h)
+      <input type="number" step="0.1" name="horometro_final" required>
+    </label>
+    <label>Combustible cargado (L)
+      <input type="number" step="0.1" name="combustible_l" required>
+    </label>
+    <label>Avance (m lineal)
+      <input type="number" step="0.1" name="avance_m" required>
+    </label>
+    <label>Profundidad de zanja (cm)
+      <input type="number" step="0.1" name="profundidad_cm" value="{{ params.profundidad_zanja_cm }}">
+    </label>
+    <label class="span-2">Observaciones
+      <textarea name="observaciones" rows="2" placeholder="Opcional"></textarea>
+    </label>
+    <div class="span-2 form-actions">
+      <button type="submit" class="btn-primary">Guardar registro</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>Últimos registros ingresados</h2>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Turno</th><th>Operador</th><th>Horas</th>
+          <th>Combustible (L)</th><th>Avance (m)</th><th>Costo total</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in registros %}
+        <tr>
+          <td>{{ r.fecha }}</td>
+          <td>{{ r.turno or '—' }}</td>
+          <td>{{ r.operador or '—' }}</td>
+          <td>{{ "%.1f"|format(r.horas_operadas) if r.horas_operadas is not none else '—' }}</td>
+          <td>{{ "%.0f"|format(r.combustible_l) if r.combustible_l is not none else '—' }}</td>
+          <td>{{ "%.0f"|format(r.avance_m) if r.avance_m is not none else '—' }}</td>
+          <td>${{ "{:,.0f}".format(r.costo_total) if r.costo_total is not none else '—' }}</td>
+          <td>
+            <form method="post" action="{{ url_for('eliminar_registro', reg_id=r.id) }}" onsubmit="return confirm('¿Eliminar este registro?');">
+              <button type="submit" class="btn-link-danger">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="empty">Sin registros todavía.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
