@@ -80,6 +80,13 @@ def init_db():
         )
     """)
     conn.execute("""
+        CREATE TABLE IF NOT EXISTS accesos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            fecha_hora TEXT NOT NULL
+        )
+    """)
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT UNIQUE NOT NULL,
@@ -215,6 +222,25 @@ def eliminar_registro(reg_id):
     conn.execute("DELETE FROM registros WHERE id = ?", (reg_id,))
     conn.commit()
     conn.close()
+
+
+def registrar_acceso(nombre):
+    conn = get_db()
+    conn.execute(
+        "INSERT INTO accesos (nombre, fecha_hora) VALUES (?, ?)",
+        (nombre, datetime.utcnow().isoformat()),
+    )
+    conn.commit()
+    conn.close()
+
+
+def listar_accesos(limit=200):
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT * FROM accesos ORDER BY id DESC LIMIT ?", (limit,)
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 
 def resumen_kpis():

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Accesos{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <h1>Registro de accesos</h1>
+    <p class="muted">Quién entró a la app y cuándo — hora en UTC</p>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>Fecha</th><th>Hora (UTC)</th><th>Nombre</th></tr>
+      </thead>
+      <tbody>
+        {% for a in accesos %}
+        <tr>
+          <td>{{ a.fecha_hora[:10] }}</td>
+          <td>{{ a.fecha_hora[11:16] }}</td>
+          <td>{{ a.nombre }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="empty">Todavía no hay accesos registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

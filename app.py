@@ -33,6 +33,7 @@ def login():
         if request.form.get("password") == APP_PASSWORD:
             session["autenticado"] = True
             session["usuario"] = request.form.get("nombre") or "Operador"
+            models.registrar_acceso(session["usuario"])
             destino = request.args.get("next") or url_for("tablero")
             return redirect(destino)
         error = "Contraseña incorrecta."
@@ -95,6 +96,12 @@ def eliminar_registro(reg_id):
     models.eliminar_registro(reg_id)
     flash("Registro eliminado.", "success")
     return redirect(request.referrer or url_for("formulario"))
+
+
+@app.route("/accesos")
+@login_required
+def accesos():
+    return render_template("accesos.html", accesos=models.listar_accesos(limit=200))
 
 
 @app.route("/parametros", methods=["GET", "POST"])
