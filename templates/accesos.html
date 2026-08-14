@@ -5,7 +5,7 @@
 <div class="page-head">
   <div>
     <h1>Registro de accesos</h1>
-    <p class="muted">Quién entró a la app y cuándo — hora en UTC</p>
+    <p class="muted">Quién entró a la app y cuándo — hora de Santiago, Chile</p>
   </div>
 </div>
 
@@ -13,13 +13,13 @@
   <div class="table-wrap">
     <table class="data-table">
       <thead>
-        <tr><th>Fecha</th><th>Hora (UTC)</th><th>Nombre</th></tr>
+        <tr><th>Fecha</th><th>Hora (Chile)</th><th>Nombre</th></tr>
       </thead>
       <tbody>
         {% for a in accesos %}
         <tr>
-          <td>{{ a.fecha_hora[:10] }}</td>
-          <td>{{ a.fecha_hora[11:16] }}</td>
+          <td>{{ a.fecha_hora_cl[:10] }}</td>
+          <td>{{ a.fecha_hora_cl[11:16] }}</td>
           <td>{{ a.nombre }}</td>
         </tr>
         {% else %}

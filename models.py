@@ -2,10 +2,12 @@
 import sqlite3
 import os
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
 DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(__file__), "zanjadora.db"))
+SANTIAGO_TZ = ZoneInfo("America/Santiago")
 
 DEFAULT_PARAMETROS = {
     "codigo_interno": "ZA-10707",
@@ -451,7 +453,16 @@ def listar_accesos(limit=200):
         "SELECT * FROM accesos ORDER BY id DESC LIMIT ?", (limit,)
     ).fetchall()
     conn.close()
-    return [dict(r) for r in rows]
+    resultado = []
+    for r in rows:
+        d = dict(r)
+        try:
+            dt_utc = datetime.fromisoformat(d["fecha_hora"]).replace(tzinfo=ZoneInfo("UTC"))
+            d["fecha_hora_cl"] = dt_utc.astimezone(SANTIAGO_TZ).strftime("%Y-%m-%dT%H:%M:%S")
+        except (ValueError, TypeError):
+            d["fecha_hora_cl"] = d["fecha_hora"]
+        resultado.append(d)
+    return resultado
 
 
 def resumen_kpis(anio=None, mes=None, poza=None):
