@@ -50,12 +50,30 @@ def logout():
 
 # ---------- Vistas ----------
 
+MESES = [
+    (1, "Enero"), (2, "Febrero"), (3, "Marzo"), (4, "Abril"),
+    (5, "Mayo"), (6, "Junio"), (7, "Julio"), (8, "Agosto"),
+    (9, "Septiembre"), (10, "Octubre"), (11, "Noviembre"), (12, "Diciembre"),
+]
+
+
 @app.route("/")
 @login_required
 def tablero():
-    kpis = models.resumen_kpis()
-    registros = models.listar_registros(limit=50)
-    return render_template("tablero.html", kpis=kpis, registros=registros)
+    anio = request.args.get("anio", type=int)
+    mes = request.args.get("mes", type=int)
+    kpis = models.resumen_kpis(anio=anio, mes=mes)
+    registros = models.listar_registros(limit=200, anio=anio, mes=mes)
+    anios_disponibles = models.listar_anios_disponibles()
+    return render_template(
+        "tablero.html",
+        kpis=kpis,
+        registros=registros,
+        meses=MESES,
+        anios_disponibles=anios_disponibles,
+        anio_sel=anio,
+        mes_sel=mes,
+    )
 
 
 @app.route("/formulario", methods=["GET", "POST"])
@@ -95,7 +113,9 @@ def formulario():
 @app.route("/registros/exportar")
 @login_required
 def exportar_registros():
-    registros = models.listar_registros(limit=100000)
+    anio = request.args.get("anio", type=int)
+    mes = request.args.get("mes", type=int)
+    registros = models.listar_registros(limit=100000, anio=anio, mes=mes)
     cols = [
         "fecha", "turno", "operador", "horometro_inicial", "horometro_final",
         "combustible_l", "avance_m", "profundidad_cm", "horas_operadas",
@@ -199,13 +219,17 @@ def parametros():
 @app.route("/api/registros")
 @login_required
 def api_registros():
-    return jsonify(models.listar_registros(limit=500))
+    anio = request.args.get("anio", type=int)
+    mes = request.args.get("mes", type=int)
+    return jsonify(models.listar_registros(limit=500, anio=anio, mes=mes))
 
 
 @app.route("/api/resumen")
 @login_required
 def api_resumen():
-    return jsonify(models.resumen_kpis())
+    anio = request.args.get("anio", type=int)
+    mes = request.args.get("mes", type=int)
+    return jsonify(models.resumen_kpis(anio=anio, mes=mes))
 
 
 @app.route("/healthz")

@@ -81,6 +81,19 @@ body {
 }
 .page-head h1 { margin: 0 0 4px; font-size: 22px; }
 .page-head-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.filtro-periodo {
+  display: flex; align-items: flex-end; flex-wrap: wrap;
+  gap: 14px; margin-bottom: 20px;
+}
+.filtro-periodo label {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+}
+.filtro-periodo select {
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; font-size: 14px; font-family: inherit; color: var(--text);
+  background: var(--panel);
+}
 .muted { color: var(--muted); margin: 0; font-size: 14px; }
 
 .btn-primary, .btn-secondary {

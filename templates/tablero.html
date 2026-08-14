@@ -5,13 +5,38 @@
 <div class="page-head">
   <div>
     <h1>Resumen e indicadores</h1>
-    <p class="muted">MAQ-001 — Zanjadora · {{ kpis.registros_ingresados }} registro(s) ingresados</p>
+    <p class="muted">
+      MAQ-001 — Zanjadora · {{ kpis.registros_ingresados }} registro(s) ingresados
+      {%- if anio_sel or mes_sel %} · Periodo: {{ meses[mes_sel - 1][1] ~ ' ' if mes_sel else '' }}{{ anio_sel or 'todos los años' }}{% endif %}
+    </p>
   </div>
   <div class="page-head-actions">
-    <a class="btn-secondary" href="{{ url_for('exportar_registros') }}">Exportar a Excel</a>
+    <a class="btn-secondary" href="{{ url_for('exportar_registros', anio=anio_sel, mes=mes_sel) }}">Exportar a Excel</a>
     <a class="btn-primary" href="{{ url_for('formulario') }}">+ Nuevo registro</a>
   </div>
 </div>
+
+<form method="get" class="filtro-periodo">
+  <label>Año
+    <select name="anio" onchange="this.form.submit()">
+      <option value="">Todos</option>
+      {% for a in anios_disponibles %}
+      <option value="{{ a }}" {{ 'selected' if anio_sel == a else '' }}>{{ a }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Mes
+    <select name="mes" onchange="this.form.submit()">
+      <option value="">Todos</option>
+      {% for num, nombre in meses %}
+      <option value="{{ num }}" {{ 'selected' if mes_sel == num else '' }}>{{ nombre }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  {% if anio_sel or mes_sel %}
+  <a href="{{ url_for('tablero') }}" class="btn-link">Limpiar filtro</a>
+  {% endif %}
+</form>
 
 <section class="kpi-grid">
   <div class="kpi-card">
@@ -98,5 +123,8 @@
 </section>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+  window.FILTRO_PERIODO = { anio: {{ anio_sel or 'null' }}, mes: {{ mes_sel or 'null' }} };
+</script>
 <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 {% endblock %}

@@ -222,13 +222,37 @@ def actualizar_registro(reg_id, data):
     conn.close()
 
 
-def listar_registros(limit=500):
+def _filtro_periodo(anio, mes):
+    condiciones = []
+    valores = []
+    if anio:
+        condiciones.append("substr(fecha, 1, 4) = ?")
+        valores.append(f"{anio:04d}")
+    if mes:
+        condiciones.append("substr(fecha, 6, 2) = ?")
+        valores.append(f"{mes:02d}")
+    where = f"WHERE {' AND '.join(condiciones)}" if condiciones else ""
+    return where, valores
+
+
+def listar_registros(limit=500, anio=None, mes=None):
+    where, valores = _filtro_periodo(anio, mes)
     conn = get_db()
     rows = conn.execute(
-        "SELECT * FROM registros ORDER BY fecha DESC, id DESC LIMIT ?", (limit,)
+        f"SELECT * FROM registros {where} ORDER BY fecha DESC, id DESC LIMIT ?",
+        (*valores, limit),
     ).fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+
+def listar_anios_disponibles():
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT DISTINCT substr(fecha, 1, 4) AS anio FROM registros ORDER BY anio DESC"
+    ).fetchall()
+    conn.close()
+    return [int(r["anio"]) for r in rows if r["anio"]]
 
 
 def obtener_registro(reg_id):
@@ -264,17 +288,18 @@ def listar_accesos(limit=200):
     return [dict(r) for r in rows]
 
 
-def resumen_kpis():
+def resumen_kpis(anio=None, mes=None):
+    where, valores = _filtro_periodo(anio, mes)
     conn = get_db()
-    row = conn.execute("""
+    row = conn.execute(f"""
         SELECT
             COUNT(*) AS registros_ingresados,
             COALESCE(SUM(horas_operadas), 0) AS horas_operadas_total,
             COALESCE(SUM(combustible_l), 0) AS combustible_total,
             COALESCE(SUM(avance_m), 0) AS avance_total,
             COALESCE(SUM(costo_total), 0) AS costo_total_acumulado
-        FROM registros
-    """).fetchone()
+        FROM registros {where}
+    """, valores).fetchone()
     conn.close()
     params = get_parametros()
     d = dict(row)
