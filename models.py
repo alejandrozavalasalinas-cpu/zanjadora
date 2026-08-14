@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(__file__), "zanjadora.db"))
 
 DEFAULT_PARAMETROS = {
-    "codigo_interno": "MAQ-001",
+    "codigo_interno": "ZA-10707",
     "nombre": "Zanjadora",
     "marca": "Tesmec",
     "modelo": "Tesmec 975 CS",

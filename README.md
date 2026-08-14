@@ -1,4 +1,4 @@
-# Control de Maquinaria — Zanjadora (MAQ-001)
+# Control de Maquinaria — Zanjadora (ZA-10707)
 
 App web para reemplazar la planilla "Control de Maquinaria" en Excel: varios operadores cargan su jornada desde un formulario, y el tablero se actualiza solo (no hay que regenerar nada a mano).
 

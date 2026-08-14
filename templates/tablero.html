@@ -6,7 +6,7 @@
   <div>
     <h1>Resumen e indicadores</h1>
     <p class="muted">
-      MAQ-001 — Zanjadora · {{ kpis.registros_ingresados }} registro(s) ingresados
+      ZA-10707 — Zanjadora · {{ kpis.registros_ingresados }} registro(s) ingresados
       {%- if anio_sel or mes_sel or poza_sel %} · Periodo: {{ meses[mes_sel - 1][1] ~ ' ' if mes_sel else '' }}{{ anio_sel or 'todos los años' }}{% if poza_sel %} · Poza: {{ poza_sel }}{% endif %}{% endif %}
     </p>
   </div>
