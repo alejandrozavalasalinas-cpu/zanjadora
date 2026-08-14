@@ -135,6 +135,31 @@
     <span class="kpi-label">Costo por metro</span>
     <span class="kpi-value">${{ "{:,.0f}".format(kpis.costo_por_metro) }}</span>
   </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Picas reemplazadas</span>
+    <span class="kpi-value">{{ "%.0f"|format(kpis.picas_reemplazadas_total) }}</span>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Reemplazo de picas por mes</h2>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>Mes</th><th>Picas reemplazadas</th></tr>
+      </thead>
+      <tbody>
+        {% for m in picas_por_mes %}
+        <tr>
+          <td>{{ meses[m.mes[5:7]|int - 1][1] }} {{ m.mes[:4] }}</td>
+          <td>{{ "%.0f"|format(m.total) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2" class="empty">Sin datos todavía.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <section class="panel">

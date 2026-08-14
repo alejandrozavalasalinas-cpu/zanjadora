@@ -49,6 +49,9 @@
     <label>Uso sistema automático (h)
       <input type="number" step="0.1" name="horas_sistema_automatico" value="{{ registro.horas_sistema_automatico or 0 }}">
     </label>
+    <label>Reemplazo de picas (cantidad)
+      <input type="number" step="1" min="0" name="picas_reemplazadas" value="{{ registro.picas_reemplazadas or 0 }}">
+    </label>
     <label class="span-2">Observaciones
       <textarea name="observaciones" rows="2" placeholder="Opcional">{{ registro.observaciones or '' }}</textarea>
     </label>
