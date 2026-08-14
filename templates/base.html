@@ -6,7 +6,7 @@
 <title>{% block title %}Control de Maquinaria{% endblock %} · MAQ-001</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="{% block bodyclass %}{% endblock %}">
 {% if session.get('autenticado') %}
 <header class="topbar">
   <div class="topbar-inner">

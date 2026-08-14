@@ -184,8 +184,13 @@ body {
 .flash-success { background: var(--ok-bg); color: var(--ok-text); }
 .flash-error { background: var(--alert-bg); color: var(--alert); }
 
+body.login-page {
+  background:
+    linear-gradient(180deg, rgba(20, 26, 22, 0.55), rgba(20, 26, 22, 0.65)),
+    url("IMG_8503.jpeg") center / cover no-repeat;
+}
 .login-wrap {
-  min-height: calc(100vh - 40px);
+  min-height: calc(100vh - 88px);
   display: flex; align-items: center; justify-content: center;
 }
 .login-card {
