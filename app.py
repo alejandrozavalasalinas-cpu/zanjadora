@@ -90,6 +90,39 @@ def formulario():
     )
 
 
+@app.route("/registros/<int:reg_id>/editar", methods=["GET", "POST"])
+@login_required
+def editar_registro(reg_id):
+    registro = models.obtener_registro(reg_id)
+    if not registro:
+        flash("Registro no encontrado.", "error")
+        return redirect(url_for("formulario"))
+    params = models.get_parametros()
+    if request.method == "POST":
+        try:
+            data = {
+                "fecha": request.form.get("fecha"),
+                "turno": request.form.get("turno"),
+                "operador": request.form.get("operador"),
+                "horometro_inicial": float(request.form.get("horometro_inicial") or 0),
+                "horometro_final": float(request.form.get("horometro_final") or 0),
+                "combustible_l": float(request.form.get("combustible_l") or 0),
+                "avance_m": float(request.form.get("avance_m") or 0),
+                "profundidad_cm": float(request.form.get("profundidad_cm") or params.get("profundidad_zanja_cm") or 0),
+                "observaciones": request.form.get("observaciones"),
+            }
+            if not data["fecha"]:
+                raise ValueError("La fecha es obligatoria.")
+            if data["horometro_final"] < data["horometro_inicial"]:
+                raise ValueError("El horómetro final no puede ser menor que el inicial.")
+            models.actualizar_registro(reg_id, data)
+            flash("Registro actualizado correctamente.", "success")
+            return redirect(url_for("formulario"))
+        except ValueError as e:
+            flash(f"Error: {e}", "error")
+    return render_template("editar_registro.html", registro=registro, params=params)
+
+
 @app.route("/registros/<int:reg_id>/eliminar", methods=["POST"])
 @login_required
 def eliminar_registro(reg_id):

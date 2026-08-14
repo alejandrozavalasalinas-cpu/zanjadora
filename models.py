@@ -201,6 +201,27 @@ def crear_registro(data):
     return new_id
 
 
+def actualizar_registro(reg_id, data):
+    params = get_parametros()
+    derivados = calcular_derivados(data, params)
+    conn = get_db()
+    cols = [
+        "fecha", "turno", "operador", "horometro_inicial", "horometro_final",
+        "combustible_l", "avance_m", "profundidad_cm", "observaciones",
+        "horas_operadas", "consumo_lh", "volumen_m3", "rendimiento_mh",
+        "costo_combustible", "costo_operador", "costo_total", "costo_hora",
+        "costo_metro", "hrs_para_mantencion", "estado_mant",
+    ]
+    values = {**data, **derivados}
+    set_clause = ", ".join([f"{c} = ?" for c in cols])
+    conn.execute(
+        f"UPDATE registros SET {set_clause} WHERE id = ?",
+        [values.get(c) for c in cols] + [reg_id],
+    )
+    conn.commit()
+    conn.close()
+
+
 def listar_registros(limit=500):
     conn = get_db()
     rows = conn.execute(

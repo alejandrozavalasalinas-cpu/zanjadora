@@ -67,7 +67,8 @@
           <td>{{ "%.0f"|format(r.combustible_l) if r.combustible_l is not none else '—' }}</td>
           <td>{{ "%.0f"|format(r.avance_m) if r.avance_m is not none else '—' }}</td>
           <td>${{ "{:,.0f}".format(r.costo_total) if r.costo_total is not none else '—' }}</td>
-          <td>
+          <td class="row-actions">
+            <a href="{{ url_for('editar_registro', reg_id=r.id) }}" class="btn-link">Editar</a>
             <form method="post" action="{{ url_for('eliminar_registro', reg_id=r.id) }}" onsubmit="return confirm('¿Eliminar este registro?');">
               <button type="submit" class="btn-link-danger">Eliminar</button>
             </form>

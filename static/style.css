@@ -100,6 +100,13 @@ body {
   cursor: pointer; font-size: 13px; text-decoration: underline;
   padding: 0;
 }
+.btn-link {
+  color: var(--accent);
+  font-size: 13px; text-decoration: underline;
+}
+.row-actions {
+  display: flex; align-items: center; gap: 12px;
+}
 
 .kpi-grid {
   display: grid;
@@ -172,7 +179,7 @@ body {
   outline-offset: 1px;
 }
 .span-2 { grid-column: span 2; }
-.form-actions { display: flex; justify-content: flex-end; margin-top: 4px; }
+.form-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 4px; }
 
 @media (max-width: 620px) {
   .form-panel .grid-form { grid-template-columns: 1fr; }
