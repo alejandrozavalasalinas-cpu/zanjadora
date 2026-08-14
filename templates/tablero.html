@@ -7,11 +7,11 @@
     <h1>Resumen e indicadores</h1>
     <p class="muted">
       MAQ-001 — Zanjadora · {{ kpis.registros_ingresados }} registro(s) ingresados
-      {%- if anio_sel or mes_sel %} · Periodo: {{ meses[mes_sel - 1][1] ~ ' ' if mes_sel else '' }}{{ anio_sel or 'todos los años' }}{% endif %}
+      {%- if anio_sel or mes_sel or poza_sel %} · Periodo: {{ meses[mes_sel - 1][1] ~ ' ' if mes_sel else '' }}{{ anio_sel or 'todos los años' }}{% if poza_sel %} · Poza: {{ poza_sel }}{% endif %}{% endif %}
     </p>
   </div>
   <div class="page-head-actions">
-    <a class="btn-secondary" href="{{ url_for('exportar_registros', anio=anio_sel, mes=mes_sel) }}">Exportar a Excel</a>
+    <a class="btn-secondary" href="{{ url_for('exportar_registros', anio=anio_sel, mes=mes_sel, poza=poza_sel) }}">Exportar a Excel</a>
     <a class="btn-primary" href="{{ url_for('formulario') }}">+ Nuevo registro</a>
   </div>
 </div>
@@ -33,7 +33,15 @@
       {% endfor %}
     </select>
   </label>
-  {% if anio_sel or mes_sel %}
+  <label>Poza
+    <select name="poza" onchange="this.form.submit()">
+      <option value="">Todas</option>
+      {% for p in pozas_disponibles %}
+      <option value="{{ p }}" {{ 'selected' if poza_sel == p else '' }}>{{ p }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  {% if anio_sel or mes_sel or poza_sel %}
   <a href="{{ url_for('tablero') }}" class="btn-link">Limpiar filtro</a>
   {% endif %}
 </form>
@@ -95,7 +103,7 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Fecha</th><th>Turno</th><th>Operador</th><th>Horas</th>
+          <th>Fecha</th><th>Turno</th><th>Operador</th><th>Poza</th><th>Horas</th>
           <th>Combustible (L)</th><th>Avance (m)</th><th>Rendim. (m/h)</th>
           <th>Costo total</th><th>Estado mant.</th><th>Observaciones</th>
         </tr>
@@ -106,6 +114,7 @@
           <td>{{ r.fecha }}</td>
           <td>{{ r.turno or '—' }}</td>
           <td>{{ r.operador or '—' }}</td>
+          <td>{{ r.poza or '—' }}</td>
           <td>{{ "%.1f"|format(r.horas_operadas) if r.horas_operadas is not none else '—' }}</td>
           <td>{{ "%.0f"|format(r.combustible_l) if r.combustible_l is not none else '—' }}</td>
           <td>{{ "%.0f"|format(r.avance_m) if r.avance_m is not none else '—' }}</td>
@@ -115,7 +124,7 @@
           <td class="obs">{{ r.observaciones or '' }}</td>
         </tr>
         {% else %}
-        <tr><td colspan="10" class="empty">Todavía no hay registros. <a href="{{ url_for('formulario') }}">Ingresa el primero</a>.</td></tr>
+        <tr><td colspan="11" class="empty">Todavía no hay registros. <a href="{{ url_for('formulario') }}">Ingresa el primero</a>.</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -124,7 +133,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script>
-  window.FILTRO_PERIODO = { anio: {{ anio_sel or 'null' }}, mes: {{ mes_sel or 'null' }} };
+  window.FILTRO_PERIODO = { anio: {{ anio_sel or 'null' }}, mes: {{ mes_sel or 'null' }}, poza: {{ poza_sel|tojson if poza_sel else 'null' }} };
 </script>
 <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 {% endblock %}

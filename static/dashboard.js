@@ -3,6 +3,7 @@ async function cargarGrafico() {
   const qs = new URLSearchParams();
   if (filtro.anio) qs.set('anio', filtro.anio);
   if (filtro.mes) qs.set('mes', filtro.mes);
+  if (filtro.poza) qs.set('poza', filtro.poza);
   const res = await fetch('/api/registros' + (qs.toString() ? `?${qs}` : ''));
   const data = await res.json();
   const ordenado = [...data].sort((a, b) => a.fecha.localeCompare(b.fecha));

@@ -4,20 +4,20 @@ App web para reemplazar la planilla "Control de Maquinaria" en Excel: varios ope
 
 ## Qué incluye
 
-- **Formulario** (`/formulario`): carga diaria (fecha, turno, operador, horómetros, combustible, avance). Calcula automáticamente horas operadas, consumo, volumen excavado, rendimiento, costos y estado de mantención — con las mismas fórmulas validadas contra la planilla original y el modelo de Power BI.
-- **Tablero** (`/`): las mismas tarjetas de indicadores que la hoja "Resumen" (horas totales, combustible, consumo promedio, desvío vs objetivo, avance, costos) + gráfico de evolución + tabla de registros.
+- **Formulario** (`/formulario`): carga diaria (fecha, turno, operador, horómetros, combustible, avance). Calcula automáticamente horas operadas, consumo, volumen excavado, rendimiento, costos y estado de mantención — con las mismas fórmulas validadas contra la planilla original y el modelo de Power BI. Los registros ya cargados se pueden editar o eliminar.
+- **Tablero** (`/`): las mismas tarjetas de indicadores que la hoja "Resumen" (horas totales, combustible, consumo promedio, desvío vs objetivo, avance, costos) + gráfico de evolución + tabla de registros. Se puede filtrar por año/mes, y exportar los registros a Excel/CSV.
 - **Parámetros** (`/parametros`): precio combustible, costo operador, objetivos de consumo/rendimiento, datos de mantención — editables sin tocar código.
-- **Acceso con contraseña compartida** (simple, para uso interno del equipo). No hay usuarios individuales todavía — ver sección "Siguientes pasos" si más adelante quieres login por persona.
+- **Cuentas individuales por operador** (`/registro` y `/login`): cada persona crea su propia cuenta (usuario sin espacios + contraseña de al menos 6 caracteres) usando la **clave de equipo** como código de invitación — sin conocerla no se puede crear una cuenta. Una vez registrado, cada quien entra con su propio usuario y contraseña; la clave de equipo ya no sirve para entrar directo, solo para registrarse. El historial de accesos (quién entró y cuándo) queda disponible en `/accesos`.
 
 ## Probar en tu computador (opcional)
 
 ```bash
 pip install -r requirements.txt
-export APP_PASSWORD="la-clave-que-quieras"
+export APP_PASSWORD="la-clave-de-equipo-que-quieras"
 python3 app.py
 ```
 
-Abre http://localhost:5000 — te va a pedir nombre y la contraseña que definiste en `APP_PASSWORD`.
+Abre http://localhost:5000, entra a "Crear una" cuenta usando la clave que definiste en `APP_PASSWORD` como clave de equipo, y desde ahí inicia sesión con tu usuario y contraseña propios.
 
 ## Desplegarlo para que tus usuarios lo usen de verdad
 
@@ -50,8 +50,6 @@ Desde entonces, cada `git push` a `main` dispara un deploy automático vía GitH
 
 ## Siguientes pasos posibles (dime si quieres que los agregue)
 
-- Login individual por operador (usuario + contraseña propia, en vez de una clave compartida) — la tabla `usuarios` ya está creada en `models.py`, solo falta conectarla.
-- Exportar los registros a Excel/CSV desde el tablero.
-- Editar un registro ya cargado (hoy solo se puede eliminar y volver a cargar).
 - Notificación automática (correo/WhatsApp) cuando el estado de mantención pase a "Alerta".
 - Respaldo automático de la base de datos.
+- Roles/permisos por usuario (hoy todas las cuentas registradas tienen el mismo acceso).

@@ -92,17 +92,21 @@ MESES = [
 def tablero():
     anio = request.args.get("anio", type=int)
     mes = request.args.get("mes", type=int)
-    kpis = models.resumen_kpis(anio=anio, mes=mes)
-    registros = models.listar_registros(limit=200, anio=anio, mes=mes)
+    poza = request.args.get("poza") or None
+    kpis = models.resumen_kpis(anio=anio, mes=mes, poza=poza)
+    registros = models.listar_registros(limit=200, anio=anio, mes=mes, poza=poza)
     anios_disponibles = models.listar_anios_disponibles()
+    pozas_disponibles = models.listar_pozas_disponibles()
     return render_template(
         "tablero.html",
         kpis=kpis,
         registros=registros,
         meses=MESES,
         anios_disponibles=anios_disponibles,
+        pozas_disponibles=pozas_disponibles,
         anio_sel=anio,
         mes_sel=mes,
+        poza_sel=poza,
     )
 
 
@@ -116,6 +120,7 @@ def formulario():
                 "fecha": request.form.get("fecha"),
                 "turno": request.form.get("turno"),
                 "operador": request.form.get("operador"),
+                "poza": request.form.get("poza"),
                 "horometro_inicial": float(request.form.get("horometro_inicial") or 0),
                 "horometro_final": float(request.form.get("horometro_final") or 0),
                 "combustible_l": float(request.form.get("combustible_l") or 0),
@@ -125,6 +130,8 @@ def formulario():
             }
             if not data["fecha"]:
                 raise ValueError("La fecha es obligatoria.")
+            if not data["poza"]:
+                raise ValueError("La poza es obligatoria.")
             if data["horometro_final"] < data["horometro_inicial"]:
                 raise ValueError("El horómetro final no puede ser menor que el inicial.")
             models.crear_registro(data)
@@ -145,16 +152,17 @@ def formulario():
 def exportar_registros():
     anio = request.args.get("anio", type=int)
     mes = request.args.get("mes", type=int)
-    registros = models.listar_registros(limit=100000, anio=anio, mes=mes)
+    poza = request.args.get("poza") or None
+    registros = models.listar_registros(limit=100000, anio=anio, mes=mes, poza=poza)
     cols = [
-        "fecha", "turno", "operador", "horometro_inicial", "horometro_final",
+        "fecha", "turno", "operador", "poza", "horometro_inicial", "horometro_final",
         "combustible_l", "avance_m", "profundidad_cm", "horas_operadas",
         "consumo_lh", "volumen_m3", "rendimiento_mh", "costo_combustible",
         "costo_operador", "costo_total", "costo_hora", "costo_metro",
         "hrs_para_mantencion", "estado_mant", "observaciones",
     ]
     headers = [
-        "Fecha", "Turno", "Operador", "Horómetro inicial", "Horómetro final",
+        "Fecha", "Turno", "Operador", "Poza", "Horómetro inicial", "Horómetro final",
         "Combustible (L)", "Avance (m)", "Profundidad (cm)", "Horas operadas",
         "Consumo (L/h)", "Volumen (m3)", "Rendimiento (m/h)", "Costo combustible",
         "Costo operador", "Costo total", "Costo por hora", "Costo por metro",
@@ -188,6 +196,7 @@ def editar_registro(reg_id):
                 "fecha": request.form.get("fecha"),
                 "turno": request.form.get("turno"),
                 "operador": request.form.get("operador"),
+                "poza": request.form.get("poza"),
                 "horometro_inicial": float(request.form.get("horometro_inicial") or 0),
                 "horometro_final": float(request.form.get("horometro_final") or 0),
                 "combustible_l": float(request.form.get("combustible_l") or 0),
@@ -197,6 +206,8 @@ def editar_registro(reg_id):
             }
             if not data["fecha"]:
                 raise ValueError("La fecha es obligatoria.")
+            if not data["poza"]:
+                raise ValueError("La poza es obligatoria.")
             if data["horometro_final"] < data["horometro_inicial"]:
                 raise ValueError("El horómetro final no puede ser menor que el inicial.")
             models.actualizar_registro(reg_id, data)
@@ -251,7 +262,8 @@ def parametros():
 def api_registros():
     anio = request.args.get("anio", type=int)
     mes = request.args.get("mes", type=int)
-    return jsonify(models.listar_registros(limit=500, anio=anio, mes=mes))
+    poza = request.args.get("poza") or None
+    return jsonify(models.listar_registros(limit=500, anio=anio, mes=mes, poza=poza))
 
 
 @app.route("/api/resumen")
@@ -259,7 +271,8 @@ def api_registros():
 def api_resumen():
     anio = request.args.get("anio", type=int)
     mes = request.args.get("mes", type=int)
-    return jsonify(models.resumen_kpis(anio=anio, mes=mes))
+    poza = request.args.get("poza") or None
+    return jsonify(models.resumen_kpis(anio=anio, mes=mes, poza=poza))
 
 
 @app.route("/healthz")

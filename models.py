@@ -61,6 +61,7 @@ def init_db():
             fecha TEXT NOT NULL,
             turno TEXT,
             operador TEXT,
+            poza TEXT,
             horometro_inicial REAL,
             horometro_final REAL,
             combustible_l REAL,
@@ -97,6 +98,10 @@ def init_db():
             creado_en TEXT
         )
     """)
+    cols_registros = [r["name"] for r in conn.execute("PRAGMA table_info(registros)").fetchall()]
+    if "poza" not in cols_registros:
+        conn.execute("ALTER TABLE registros ADD COLUMN poza TEXT")
+
     row = conn.execute("SELECT COUNT(*) c FROM parametros").fetchone()
     if row["c"] == 0:
         cols = ", ".join(DEFAULT_PARAMETROS.keys())
@@ -185,7 +190,7 @@ def crear_registro(data):
     derivados = calcular_derivados(data, params)
     conn = get_db()
     cols = [
-        "fecha", "turno", "operador", "horometro_inicial", "horometro_final",
+        "fecha", "turno", "operador", "poza", "horometro_inicial", "horometro_final",
         "combustible_l", "avance_m", "profundidad_cm", "observaciones",
         "horas_operadas", "consumo_lh", "volumen_m3", "rendimiento_mh",
         "costo_combustible", "costo_operador", "costo_total", "costo_hora",
@@ -208,7 +213,7 @@ def actualizar_registro(reg_id, data):
     derivados = calcular_derivados(data, params)
     conn = get_db()
     cols = [
-        "fecha", "turno", "operador", "horometro_inicial", "horometro_final",
+        "fecha", "turno", "operador", "poza", "horometro_inicial", "horometro_final",
         "combustible_l", "avance_m", "profundidad_cm", "observaciones",
         "horas_operadas", "consumo_lh", "volumen_m3", "rendimiento_mh",
         "costo_combustible", "costo_operador", "costo_total", "costo_hora",
@@ -224,7 +229,7 @@ def actualizar_registro(reg_id, data):
     conn.close()
 
 
-def _filtro_periodo(anio, mes):
+def _filtro_periodo(anio, mes, poza=None):
     condiciones = []
     valores = []
     if anio:
@@ -233,12 +238,15 @@ def _filtro_periodo(anio, mes):
     if mes:
         condiciones.append("substr(fecha, 6, 2) = ?")
         valores.append(f"{mes:02d}")
+    if poza:
+        condiciones.append("poza = ?")
+        valores.append(poza)
     where = f"WHERE {' AND '.join(condiciones)}" if condiciones else ""
     return where, valores
 
 
-def listar_registros(limit=500, anio=None, mes=None):
-    where, valores = _filtro_periodo(anio, mes)
+def listar_registros(limit=500, anio=None, mes=None, poza=None):
+    where, valores = _filtro_periodo(anio, mes, poza)
     conn = get_db()
     rows = conn.execute(
         f"SELECT * FROM registros {where} ORDER BY fecha DESC, id DESC LIMIT ?",
@@ -255,6 +263,15 @@ def listar_anios_disponibles():
     ).fetchall()
     conn.close()
     return [int(r["anio"]) for r in rows if r["anio"]]
+
+
+def listar_pozas_disponibles():
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT DISTINCT poza FROM registros WHERE poza IS NOT NULL AND poza != '' ORDER BY poza"
+    ).fetchall()
+    conn.close()
+    return [r["poza"] for r in rows]
 
 
 def obtener_registro(reg_id):
@@ -318,8 +335,8 @@ def listar_accesos(limit=200):
     return [dict(r) for r in rows]
 
 
-def resumen_kpis(anio=None, mes=None):
-    where, valores = _filtro_periodo(anio, mes)
+def resumen_kpis(anio=None, mes=None, poza=None):
+    where, valores = _filtro_periodo(anio, mes, poza)
     conn = get_db()
     row = conn.execute(f"""
         SELECT
