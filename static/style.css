@@ -47,10 +47,10 @@ body {
   align-items: center;
   gap: 8px;
 }
-.brand-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--accent);
-  display: inline-block;
+.brand-logo {
+  height: 30px;
+  width: auto;
+  display: block;
 }
 .nav { display: flex; gap: 4px; align-items: center; }
 .nav a {
