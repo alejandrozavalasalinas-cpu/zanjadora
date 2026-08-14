@@ -200,6 +200,26 @@ body {
   .span-2 { grid-column: span 1; }
 }
 
+.poza-form {
+  display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;
+  margin-top: 16px;
+}
+.poza-form label { flex: 1; min-width: 160px; }
+.poza-form .form-actions { margin-top: 0; }
+
+.poza-progreso { margin-bottom: 20px; }
+.poza-progreso-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 14px; margin-bottom: 10px;
+}
+.poza-progreso-pct { font-size: 20px; font-weight: 700; color: var(--accent-dark); }
+.progress-bar {
+  height: 10px; border-radius: 999px; background: var(--bg);
+  border: 1px solid var(--border); overflow: hidden;
+}
+.progress-bar-fill { height: 100%; background: var(--accent); border-radius: 999px; }
+.poza-progreso .muted { margin-top: 8px; }
+
 .flash-stack { margin-bottom: 18px; display: flex; flex-direction: column; gap: 8px; }
 .flash { padding: 11px 14px; border-radius: 8px; font-size: 14px; font-weight: 500; }
 .flash-success { background: var(--ok-bg); color: var(--ok-text); }

@@ -24,7 +24,13 @@
       <input type="text" name="operador" placeholder="Nombre del operador" required>
     </label>
     <label>Poza
-      <input type="text" name="poza" placeholder="Ej: Poza 3" required>
+      <select name="poza" required>
+        <option value="" disabled selected>Selecciona una poza</option>
+        {% for p in pozas %}
+        <option value="{{ p.nombre }}">{{ p.nombre }}</option>
+        {% endfor %}
+      </select>
+      {% if not pozas %}<span class="muted">No hay pozas creadas — agrégalas en <a href="{{ url_for('parametros') }}">Parámetros</a>.</span>{% endif %}
     </label>
     <label>Horómetro inicial (h)
       <input type="number" step="0.1" name="horometro_inicial" required>

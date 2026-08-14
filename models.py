@@ -98,6 +98,14 @@ def init_db():
             creado_en TEXT
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS pozas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT UNIQUE NOT NULL,
+            metros_totales REAL,
+            creado_en TEXT
+        )
+    """)
     cols_registros = [r["name"] for r in conn.execute("PRAGMA table_info(registros)").fetchall()]
     if "poza" not in cols_registros:
         conn.execute("ALTER TABLE registros ADD COLUMN poza TEXT")
@@ -265,13 +273,43 @@ def listar_anios_disponibles():
     return [int(r["anio"]) for r in rows if r["anio"]]
 
 
-def listar_pozas_disponibles():
+def crear_poza(nombre, metros_totales):
     conn = get_db()
-    rows = conn.execute(
-        "SELECT DISTINCT poza FROM registros WHERE poza IS NOT NULL AND poza != '' ORDER BY poza"
-    ).fetchall()
+    try:
+        conn.execute(
+            "INSERT INTO pozas (nombre, metros_totales, creado_en) VALUES (?, ?, ?)",
+            (nombre, metros_totales, datetime.utcnow().isoformat()),
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        raise ValueError("Ya existe una poza con ese nombre.")
+    finally:
+        conn.close()
+
+
+def listar_pozas():
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM pozas ORDER BY nombre").fetchall()
     conn.close()
-    return [r["poza"] for r in rows]
+    return [dict(r) for r in rows]
+
+
+def obtener_poza(nombre):
+    conn = get_db()
+    row = conn.execute("SELECT * FROM pozas WHERE nombre = ?", (nombre,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def eliminar_poza(poza_id):
+    conn = get_db()
+    conn.execute("DELETE FROM pozas WHERE id = ?", (poza_id,))
+    conn.commit()
+    conn.close()
+
+
+def listar_pozas_disponibles():
+    return [p["nombre"] for p in listar_pozas()]
 
 
 def obtener_registro(reg_id):

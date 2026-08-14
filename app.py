@@ -97,6 +97,13 @@ def tablero():
     registros = models.listar_registros(limit=200, anio=anio, mes=mes, poza=poza)
     anios_disponibles = models.listar_anios_disponibles()
     pozas_disponibles = models.listar_pozas_disponibles()
+    avance_poza_pct = None
+    metros_totales_poza = None
+    if poza:
+        poza_info = models.obtener_poza(poza)
+        if poza_info and poza_info.get("metros_totales"):
+            metros_totales_poza = poza_info["metros_totales"]
+            avance_poza_pct = (kpis["avance_total"] / metros_totales_poza) * 100
     return render_template(
         "tablero.html",
         kpis=kpis,
@@ -107,6 +114,8 @@ def tablero():
         anio_sel=anio,
         mes_sel=mes,
         poza_sel=poza,
+        avance_poza_pct=avance_poza_pct,
+        metros_totales_poza=metros_totales_poza,
     )
 
 
@@ -144,6 +153,7 @@ def formulario():
         params=params,
         hoy=datetime.now().strftime("%Y-%m-%d"),
         registros=models.listar_registros(limit=15),
+        pozas=models.listar_pozas(),
     )
 
 
@@ -215,7 +225,9 @@ def editar_registro(reg_id):
             return redirect(url_for("formulario"))
         except ValueError as e:
             flash(f"Error: {e}", "error")
-    return render_template("editar_registro.html", registro=registro, params=params)
+    return render_template(
+        "editar_registro.html", registro=registro, params=params, pozas=models.listar_pozas()
+    )
 
 
 @app.route("/registros/<int:reg_id>/eliminar", methods=["POST"])
@@ -252,7 +264,34 @@ def parametros():
         models.update_parametros(data)
         flash("Parámetros actualizados.", "success")
         return redirect(url_for("parametros"))
-    return render_template("parametros.html", params=models.get_parametros())
+    return render_template(
+        "parametros.html",
+        params=models.get_parametros(),
+        pozas=models.listar_pozas(),
+    )
+
+
+@app.route("/parametros/pozas", methods=["POST"])
+@login_required
+def crear_poza():
+    nombre = (request.form.get("nombre") or "").strip()
+    try:
+        metros_totales = float(request.form.get("metros_totales") or 0)
+        if not nombre:
+            raise ValueError("El nombre de la poza es obligatorio.")
+        models.crear_poza(nombre, metros_totales)
+        flash("Poza agregada.", "success")
+    except ValueError as e:
+        flash(f"Error: {e}", "error")
+    return redirect(url_for("parametros"))
+
+
+@app.route("/parametros/pozas/<int:poza_id>/eliminar", methods=["POST"])
+@login_required
+def eliminar_poza(poza_id):
+    models.eliminar_poza(poza_id)
+    flash("Poza eliminada.", "success")
+    return redirect(url_for("parametros"))
 
 
 # ---------- API JSON (para el gráfico del tablero) ----------

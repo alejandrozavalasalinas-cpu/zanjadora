@@ -69,4 +69,42 @@
     </div>
   </form>
 </section>
+
+<section class="panel">
+  <h2>Pozas</h2>
+  <p class="muted">Define las pozas de trabajo y su meta de metros lineales totales — el tablero usa esto para calcular el % de avance al filtrar por poza.</p>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>Poza</th><th>Metros totales</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for p in pozas %}
+        <tr>
+          <td>{{ p.nombre }}</td>
+          <td>{{ "{:,.0f}".format(p.metros_totales) if p.metros_totales is not none else '—' }}</td>
+          <td>
+            <form method="post" action="{{ url_for('eliminar_poza', poza_id=p.id) }}" onsubmit="return confirm('¿Eliminar esta poza?');">
+              <button type="submit" class="btn-link-danger">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="empty">Todavía no hay pozas creadas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <form method="post" action="{{ url_for('crear_poza') }}" class="grid-form poza-form">
+    <label>Nombre de la poza
+      <input type="text" name="nombre" placeholder="Ej: Poza 3" required>
+    </label>
+    <label>Metros lineales totales
+      <input type="number" step="0.1" name="metros_totales" placeholder="Ej: 500" required>
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="btn-secondary">Agregar poza</button>
+    </div>
+  </form>
+</section>
 {% endblock %}
