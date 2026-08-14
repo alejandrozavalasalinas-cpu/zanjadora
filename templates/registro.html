@@ -7,8 +7,8 @@
     <div class="brand login-brand"><img src="{{ url_for('static', filename='besalco-logo-green.png') }}" alt="Besalco" class="brand-logo">Control de Maquinaria</div>
     <p class="muted">Crear tu cuenta — Zanjadora MAQ-001</p>
     {% if error %}<div class="flash flash-error">{{ error }}</div>{% endif %}
-    <label>Tu nombre
-      <input type="text" name="nombre" placeholder="Ej: J. Pérez" required>
+    <label>Usuario
+      <input type="text" name="nombre" placeholder="Ej: jperez" pattern="\S+" title="Sin espacios" required>
     </label>
     <label>Contraseña
       <input type="password" name="password" required minlength="6">

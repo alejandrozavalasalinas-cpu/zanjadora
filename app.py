@@ -55,7 +55,9 @@ def registro():
         clave_invitacion = request.form.get("clave_invitacion") or ""
         try:
             if not nombre:
-                raise ValueError("El nombre es obligatorio.")
+                raise ValueError("El usuario es obligatorio.")
+            if " " in nombre:
+                raise ValueError("El usuario no puede tener espacios.")
             if len(password) < 6:
                 raise ValueError("La contraseña debe tener al menos 6 caracteres.")
             if password != confirmar:
