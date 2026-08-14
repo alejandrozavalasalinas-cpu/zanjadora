@@ -156,6 +156,11 @@ def formulario():
                 raise ValueError("La fecha es obligatoria.")
             if not data["poza"]:
                 raise ValueError("La poza es obligatoria.")
+            ultimo_horometro = models.ultimo_horometro_final()
+            if ultimo_horometro is not None and data["horometro_inicial"] != ultimo_horometro:
+                raise ValueError(
+                    f"El horómetro inicial debe ser igual al último horómetro final registrado ({ultimo_horometro})."
+                )
             if data["horometro_final"] < data["horometro_inicial"]:
                 raise ValueError("El horómetro final no puede ser menor que el inicial.")
             if data["horas_sistema_automatico"] > (data["horometro_final"] - data["horometro_inicial"]):
@@ -171,6 +176,7 @@ def formulario():
         hoy=datetime.now().strftime("%Y-%m-%d"),
         registros=models.listar_registros(limit=15),
         pozas=models.listar_pozas(),
+        ultimo_horometro=models.ultimo_horometro_final(),
     )
 
 

@@ -192,6 +192,7 @@ body {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
+.grid-form input[readonly] { background: var(--bg); color: var(--muted); cursor: not-allowed; }
 .span-2 { grid-column: span 2; }
 .form-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 4px; }
 

@@ -346,6 +346,15 @@ def picas_reemplazadas_por_mes(anio=None, poza=None):
     return [dict(r) for r in rows]
 
 
+def ultimo_horometro_final():
+    conn = get_db()
+    row = conn.execute(
+        "SELECT horometro_final FROM registros ORDER BY fecha DESC, id DESC LIMIT 1"
+    ).fetchone()
+    conn.close()
+    return row["horometro_final"] if row else None
+
+
 def obtener_registro(reg_id):
     conn = get_db()
     row = conn.execute("SELECT * FROM registros WHERE id = ?", (reg_id,)).fetchone()

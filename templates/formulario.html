@@ -33,7 +33,8 @@
       {% if not pozas %}<span class="muted">No hay pozas creadas — agrégalas en <a href="{{ url_for('parametros') }}">Parámetros</a>.</span>{% endif %}
     </label>
     <label>Horómetro inicial (h)
-      <input type="number" step="0.1" name="horometro_inicial" required>
+      <input type="number" step="0.1" name="horometro_inicial" value="{{ ultimo_horometro }}" {{ 'readonly' if ultimo_horometro is not none else '' }} required>
+      {% if ultimo_horometro is not none %}<span class="muted">Continúa automáticamente desde el último horómetro final registrado</span>{% endif %}
     </label>
     <label>Horómetro final (h)
       <input type="number" step="0.1" name="horometro_final" required>
