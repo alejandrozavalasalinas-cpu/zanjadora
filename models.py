@@ -103,9 +103,14 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT UNIQUE NOT NULL,
             metros_totales REAL,
+            altura_cm REAL,
             creado_en TEXT
         )
     """)
+    cols_pozas = [r["name"] for r in conn.execute("PRAGMA table_info(pozas)").fetchall()]
+    if "altura_cm" not in cols_pozas:
+        conn.execute("ALTER TABLE pozas ADD COLUMN altura_cm REAL")
+
     cols_registros = [r["name"] for r in conn.execute("PRAGMA table_info(registros)").fetchall()]
     if "poza" not in cols_registros:
         conn.execute("ALTER TABLE registros ADD COLUMN poza TEXT")
@@ -273,12 +278,12 @@ def listar_anios_disponibles():
     return [int(r["anio"]) for r in rows if r["anio"]]
 
 
-def crear_poza(nombre, metros_totales):
+def crear_poza(nombre, metros_totales, altura_cm):
     conn = get_db()
     try:
         conn.execute(
-            "INSERT INTO pozas (nombre, metros_totales, creado_en) VALUES (?, ?, ?)",
-            (nombre, metros_totales, datetime.utcnow().isoformat()),
+            "INSERT INTO pozas (nombre, metros_totales, altura_cm, creado_en) VALUES (?, ?, ?, ?)",
+            (nombre, metros_totales, altura_cm, datetime.utcnow().isoformat()),
         )
         conn.commit()
     except sqlite3.IntegrityError:
@@ -382,6 +387,7 @@ def resumen_kpis(anio=None, mes=None, poza=None):
             COALESCE(SUM(horas_operadas), 0) AS horas_operadas_total,
             COALESCE(SUM(combustible_l), 0) AS combustible_total,
             COALESCE(SUM(avance_m), 0) AS avance_total,
+            COALESCE(SUM(volumen_m3), 0) AS volumen_total,
             COALESCE(SUM(costo_total), 0) AS costo_total_acumulado
         FROM registros {where}
     """, valores).fetchone()

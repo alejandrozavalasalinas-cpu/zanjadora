@@ -99,11 +99,20 @@ def tablero():
     pozas_disponibles = models.listar_pozas_disponibles()
     avance_poza_pct = None
     metros_totales_poza = None
+    meta_m3_poza = None
+    avance_m3_poza_pct = None
     if poza:
         poza_info = models.obtener_poza(poza)
         if poza_info and poza_info.get("metros_totales"):
             metros_totales_poza = poza_info["metros_totales"]
             avance_poza_pct = (kpis["avance_total"] / metros_totales_poza) * 100
+        if poza_info and poza_info.get("metros_totales") and poza_info.get("altura_cm"):
+            ancho_zanja_cm = models.get_parametros().get("ancho_zanja_cm") or 0
+            meta_m3_poza = (
+                poza_info["metros_totales"] * (poza_info["altura_cm"] / 100) * (ancho_zanja_cm / 100)
+            )
+            if meta_m3_poza:
+                avance_m3_poza_pct = (kpis["volumen_total"] / meta_m3_poza) * 100
     return render_template(
         "tablero.html",
         kpis=kpis,
@@ -116,6 +125,8 @@ def tablero():
         poza_sel=poza,
         avance_poza_pct=avance_poza_pct,
         metros_totales_poza=metros_totales_poza,
+        meta_m3_poza=meta_m3_poza,
+        avance_m3_poza_pct=avance_m3_poza_pct,
     )
 
 
@@ -277,9 +288,10 @@ def crear_poza():
     nombre = (request.form.get("nombre") or "").strip()
     try:
         metros_totales = float(request.form.get("metros_totales") or 0)
+        altura_cm = float(request.form.get("altura_cm") or 0)
         if not nombre:
             raise ValueError("El nombre de la poza es obligatorio.")
-        models.crear_poza(nombre, metros_totales)
+        models.crear_poza(nombre, metros_totales, altura_cm)
         flash("Poza agregada.", "success")
     except ValueError as e:
         flash(f"Error: {e}", "error")

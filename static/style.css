@@ -208,6 +208,8 @@ body {
 .poza-form .form-actions { margin-top: 0; }
 
 .poza-progreso { margin-bottom: 20px; }
+.poza-progreso h2 { margin: 0 0 14px; }
+.poza-progreso-item + .poza-progreso-item { margin-top: 18px; }
 .poza-progreso-head {
   display: flex; justify-content: space-between; align-items: baseline;
   font-size: 14px; margin-bottom: 10px;
