@@ -47,7 +47,8 @@
       <input type="number" step="0.1" name="profundidad_cm" value="{{ registro.profundidad_cm or params.profundidad_zanja_cm }}">
     </label>
     <label>Uso sistema automático (h)
-      <input type="number" step="0.1" name="horas_sistema_automatico" value="{{ registro.horas_sistema_automatico or 0 }}">
+      <input type="number" step="0.1" name="horas_sistema_automatico" id="horas_sistema_automatico" value="{{ registro.horas_sistema_automatico or 0 }}">
+      <span class="muted">Se recalcula con las horas operadas si cambias el horómetro — descuenta manualmente si hubo horas fuera de automático</span>
     </label>
     <label>Reemplazo de picas (cantidad)
       <input type="number" step="1" min="0" name="picas_reemplazadas" value="{{ registro.picas_reemplazadas or 0 }}">
@@ -61,4 +62,22 @@
     </div>
   </form>
 </section>
+
+<script>
+  (function () {
+    var inicial = document.querySelector('input[name="horometro_inicial"]');
+    var final = document.querySelector('input[name="horometro_final"]');
+    var automatico = document.getElementById('horas_sistema_automatico');
+    if (!inicial || !final || !automatico) return;
+    function actualizarAutomatico() {
+      var hi = parseFloat(inicial.value);
+      var hf = parseFloat(final.value);
+      if (!isNaN(hi) && !isNaN(hf) && hf >= hi) {
+        automatico.value = (hf - hi).toFixed(1);
+      }
+    }
+    inicial.addEventListener('input', actualizarAutomatico);
+    final.addEventListener('input', actualizarAutomatico);
+  })();
+</script>
 {% endblock %}
