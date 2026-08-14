@@ -16,9 +16,11 @@
     </div>
     <nav class="nav">
       <a href="{{ url_for('tablero') }}" class="{{ 'active' if request.endpoint == 'tablero' else '' }}">Tablero</a>
+      {% if session.get('rol') != 'visor' %}
       <a href="{{ url_for('formulario') }}" class="{{ 'active' if request.endpoint == 'formulario' else '' }}">Nuevo registro</a>
       <a href="{{ url_for('parametros') }}" class="{{ 'active' if request.endpoint == 'parametros' else '' }}">Parámetros</a>
       <a href="{{ url_for('accesos') }}" class="{{ 'active' if request.endpoint == 'accesos' else '' }}">Accesos</a>
+      {% endif %}
       <a href="{{ url_for('logout') }}" class="salir">Salir</a>
     </nav>
   </div>

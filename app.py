@@ -28,6 +28,16 @@ def login_required(view):
     return wrapped
 
 
+def operador_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if session.get("rol") == "visor":
+            flash("Tu cuenta solo tiene acceso al tablero.", "error")
+            return redirect(url_for("tablero"))
+        return view(*args, **kwargs)
+    return wrapped
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     error = None
@@ -38,8 +48,9 @@ def login():
         if usuario:
             session["autenticado"] = True
             session["usuario"] = usuario["nombre"]
+            session["rol"] = usuario["rol"]
             models.registrar_acceso(session["usuario"])
-            destino = request.args.get("next") or url_for("tablero")
+            destino = url_for("tablero") if usuario["rol"] == "visor" else (request.args.get("next") or url_for("tablero"))
             return redirect(destino)
         error = "Usuario o contraseña incorrectos."
     return render_template("login.html", error=error)
@@ -142,6 +153,7 @@ def tablero():
 
 @app.route("/formulario", methods=["GET", "POST"])
 @login_required
+@operador_required
 def formulario():
     params = models.get_parametros()
     if request.method == "POST":
@@ -228,6 +240,7 @@ def exportar_registros():
 
 @app.route("/registros/<int:reg_id>/editar", methods=["GET", "POST"])
 @login_required
+@operador_required
 def editar_registro(reg_id):
     registro = models.obtener_registro(reg_id)
     if not registro:
@@ -273,6 +286,7 @@ def editar_registro(reg_id):
 
 @app.route("/registros/<int:reg_id>/eliminar", methods=["POST"])
 @login_required
+@operador_required
 def eliminar_registro(reg_id):
     models.eliminar_registro(reg_id)
     flash("Registro eliminado.", "success")
@@ -281,12 +295,14 @@ def eliminar_registro(reg_id):
 
 @app.route("/accesos")
 @login_required
+@operador_required
 def accesos():
     return render_template("accesos.html", accesos=models.listar_accesos(limit=200))
 
 
 @app.route("/parametros", methods=["GET", "POST"])
 @login_required
+@operador_required
 def parametros():
     if request.method == "POST":
         campos_num = [
@@ -314,6 +330,7 @@ def parametros():
 
 @app.route("/parametros/pozas", methods=["POST"])
 @login_required
+@operador_required
 def crear_poza():
     nombre = (request.form.get("nombre") or "").strip()
     try:
@@ -331,6 +348,7 @@ def crear_poza():
 
 @app.route("/parametros/pozas/<int:poza_id>/eliminar", methods=["POST"])
 @login_required
+@operador_required
 def eliminar_poza(poza_id):
     models.eliminar_poza(poza_id)
     flash("Poza eliminada.", "success")

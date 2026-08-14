@@ -12,7 +12,9 @@
   </div>
   <div class="page-head-actions">
     <a class="btn-secondary" href="{{ url_for('exportar_registros', anio=anio_sel, mes=mes_sel, poza=poza_sel) }}">Exportar a Excel</a>
+    {% if session.get('rol') != 'visor' %}
     <a class="btn-primary" href="{{ url_for('formulario') }}">+ Nuevo registro</a>
+    {% endif %}
   </div>
 </div>
 
@@ -135,6 +137,7 @@
     <span class="kpi-label">Rendimiento promedio</span>
     <span class="kpi-value">{{ "%.2f"|format(kpis.rendimiento_promedio) }} m/h</span>
   </div>
+  {% if session.get('rol') != 'visor' %}
   <div class="kpi-card">
     <span class="kpi-label">Costo total acumulado</span>
     <span class="kpi-value">${{ "{:,.0f}".format(kpis.costo_total_acumulado) }}</span>
@@ -147,6 +150,7 @@
     <span class="kpi-label">Costo por metro</span>
     <span class="kpi-value">${{ "{:,.0f}".format(kpis.costo_por_metro) }}</span>
   </div>
+  {% endif %}
   <div class="kpi-card">
     <span class="kpi-label">Picas reemplazadas</span>
     <span class="kpi-value">{{ "%.0f"|format(kpis.picas_reemplazadas_total) }}</span>
@@ -207,7 +211,9 @@
 <section class="panel">
   <div class="panel-head">
     <h2>Registro diario</h2>
+    {% if session.get('rol') != 'visor' %}
     <a class="btn-secondary" href="{{ url_for('formulario') }}">Ver / editar en el formulario</a>
+    {% endif %}
   </div>
   <div class="table-wrap">
     <table class="data-table">
