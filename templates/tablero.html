@@ -151,7 +151,7 @@
     <span class="kpi-label">Picas reemplazadas</span>
     <span class="kpi-value">{{ "%.0f"|format(kpis.picas_reemplazadas_total) }}</span>
   </div>
-  <div class="kpi-card">
+  <div class="kpi-card {{ 'kpi-alert' if poza_sel else '' }}">
     <span class="kpi-label">Roturas identificadas</span>
     <span class="kpi-value">{{ "%.0f"|format(kpis.roturas_identificadas_total) }}</span>
   </div>
