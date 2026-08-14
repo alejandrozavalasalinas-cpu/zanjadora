@@ -32,14 +32,42 @@ def login_required(view):
 def login():
     error = None
     if request.method == "POST":
-        if request.form.get("password") == APP_PASSWORD:
+        nombre = (request.form.get("nombre") or "").strip()
+        password = request.form.get("password") or ""
+        usuario = models.verificar_usuario(nombre, password)
+        if usuario or (password == APP_PASSWORD and password):
             session["autenticado"] = True
-            session["usuario"] = request.form.get("nombre") or "Operador"
+            session["usuario"] = usuario["nombre"] if usuario else (nombre or "Operador")
             models.registrar_acceso(session["usuario"])
             destino = request.args.get("next") or url_for("tablero")
             return redirect(destino)
-        error = "Contraseña incorrecta."
+        error = "Nombre o contraseña incorrectos."
     return render_template("login.html", error=error)
+
+
+@app.route("/registro", methods=["GET", "POST"])
+def registro():
+    error = None
+    if request.method == "POST":
+        nombre = (request.form.get("nombre") or "").strip()
+        password = request.form.get("password") or ""
+        confirmar = request.form.get("confirmar") or ""
+        clave_invitacion = request.form.get("clave_invitacion") or ""
+        try:
+            if not nombre:
+                raise ValueError("El nombre es obligatorio.")
+            if len(password) < 6:
+                raise ValueError("La contraseña debe tener al menos 6 caracteres.")
+            if password != confirmar:
+                raise ValueError("Las contraseñas no coinciden.")
+            if clave_invitacion != APP_PASSWORD:
+                raise ValueError("Clave de equipo incorrecta.")
+            models.crear_usuario(nombre, password)
+            flash("Cuenta creada. Ya puedes iniciar sesión.", "success")
+            return redirect(url_for("login"))
+        except ValueError as e:
+            error = str(e)
+    return render_template("registro.html", error=error)
 
 
 @app.route("/logout")

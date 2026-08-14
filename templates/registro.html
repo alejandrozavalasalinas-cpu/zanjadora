@@ -1,20 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Ingresar{% endblock %}
+{% block title %}Crear cuenta{% endblock %}
 {% block bodyclass %}login-page{% endblock %}
 {% block content %}
 <div class="login-wrap">
   <form class="login-card" method="post">
     <div class="brand login-brand"><img src="{{ url_for('static', filename='besalco-logo-green.png') }}" alt="Besalco" class="brand-logo">Control de Maquinaria</div>
-    <p class="muted">Zanjadora MAQ-001 — acceso interno</p>
+    <p class="muted">Crear tu cuenta — Zanjadora MAQ-001</p>
     {% if error %}<div class="flash flash-error">{{ error }}</div>{% endif %}
     <label>Tu nombre
       <input type="text" name="nombre" placeholder="Ej: J. Pérez" required>
     </label>
     <label>Contraseña
-      <input type="password" name="password" required>
+      <input type="password" name="password" required minlength="6">
     </label>
-    <button type="submit">Entrar</button>
-    <p class="muted login-hint">¿No tienes cuenta? <a href="{{ url_for('registro') }}">Crear una</a></p>
+    <label>Confirmar contraseña
+      <input type="password" name="confirmar" required minlength="6">
+    </label>
+    <label>Clave de equipo
+      <input type="password" name="clave_invitacion" required>
+    </label>
+    <button type="submit">Crear cuenta</button>
+    <p class="muted login-hint">¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
   </form>
 </div>
 {% endblock %}

@@ -3,6 +3,8 @@ import sqlite3
 import os
 from datetime import datetime
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
 DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(__file__), "zanjadora.db"))
 
 DEFAULT_PARAMETROS = {
@@ -267,6 +269,34 @@ def eliminar_registro(reg_id):
     conn.execute("DELETE FROM registros WHERE id = ?", (reg_id,))
     conn.commit()
     conn.close()
+
+
+def crear_usuario(nombre, password, rol="operador"):
+    conn = get_db()
+    try:
+        conn.execute(
+            "INSERT INTO usuarios (nombre, password_hash, rol, creado_en) VALUES (?, ?, ?, ?)",
+            (nombre, generate_password_hash(password), rol, datetime.utcnow().isoformat()),
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        raise ValueError("Ya existe un usuario registrado con ese nombre.")
+    finally:
+        conn.close()
+
+
+def obtener_usuario(nombre):
+    conn = get_db()
+    row = conn.execute("SELECT * FROM usuarios WHERE nombre = ?", (nombre,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def verificar_usuario(nombre, password):
+    usuario = obtener_usuario(nombre)
+    if usuario and check_password_hash(usuario["password_hash"], password):
+        return usuario
+    return None
 
 
 def registrar_acceso(nombre):
