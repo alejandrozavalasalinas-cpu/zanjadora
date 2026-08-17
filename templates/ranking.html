@@ -53,6 +53,12 @@
   <div class="chart-canvas-wrap chart-canvas-wrap-tall"><canvas id="chartRanking"></canvas></div>
 </section>
 
+<section class="panel chart-card">
+  <h2>Rendimiento por poza (m/h)</h2>
+  <p class="muted">Metros lineales de avance por hora operada en cada poza — de mayor a menor rendimiento.</p>
+  <div class="chart-canvas-wrap chart-canvas-wrap-tall"><canvas id="chartRendimientoPozas"></canvas></div>
+</section>
+
 <section class="panel">
   <h2>Detalle por operador</h2>
   <div class="table-wrap">
@@ -89,6 +95,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
 <script>
   const rankingData = {{ ranking|tojson }};
+  const rankingPozasData = {{ ranking_pozas|tojson }};
 
   const ctxRendimiento = document.getElementById('chartRendimiento');
   if (ctxRendimiento && rankingData.length) {
@@ -139,6 +146,34 @@
         plugins: { legend: { display: false } },
         scales: {
           x: { title: { display: true, text: 'm lineal' }, grid: { color: '#eef0f3' } },
+          y: { grid: { display: false } },
+        },
+      },
+    });
+  }
+
+  const ctxRendimientoPozas = document.getElementById('chartRendimientoPozas');
+  if (ctxRendimientoPozas && rankingPozasData.length) {
+    const porRendimientoPoza = [...rankingPozasData].sort((a, b) => b.rendimiento_mh - a.rendimiento_mh);
+    new Chart(ctxRendimientoPozas, {
+      type: 'bar',
+      data: {
+        labels: porRendimientoPoza.map(r => r.poza),
+        datasets: [{
+          label: 'Rendimiento (m/h)',
+          data: porRendimientoPoza.map(r => r.rendimiento_mh),
+          backgroundColor: '#00968f',
+          borderRadius: 4,
+          maxBarThickness: 36,
+        }],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'm/h' }, grid: { color: '#eef0f3' } },
           y: { grid: { display: false } },
         },
       },

@@ -190,9 +190,11 @@ def ranking():
     mes = request.args.get("mes", type=int)
     poza = request.args.get("poza") or None
     ranking_data = models.ranking_operadores(anio=anio, mes=mes, poza=poza)
+    ranking_pozas_data = models.ranking_pozas(anio=anio, mes=mes, poza=poza)
     return render_template(
         "ranking.html",
         ranking=ranking_data,
+        ranking_pozas=ranking_pozas_data,
         meses=MESES,
         anios_disponibles=models.listar_anios_disponibles(),
         pozas_disponibles=models.listar_pozas_disponibles(),
