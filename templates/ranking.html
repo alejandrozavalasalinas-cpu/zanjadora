@@ -43,6 +43,12 @@
 </form>
 
 <section class="panel chart-card">
+  <h2>Rendimiento por operador (m/h)</h2>
+  <p class="muted">Metros lineales de avance por hora operada — de mayor a menor rendimiento.</p>
+  <div class="chart-canvas-wrap chart-canvas-wrap-tall"><canvas id="chartRendimiento"></canvas></div>
+</section>
+
+<section class="panel chart-card">
   <h2>Avance total por operador (m lineal)</h2>
   <div class="chart-canvas-wrap chart-canvas-wrap-tall"><canvas id="chartRanking"></canvas></div>
 </section>
@@ -83,6 +89,35 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
 <script>
   const rankingData = {{ ranking|tojson }};
+
+  const ctxRendimiento = document.getElementById('chartRendimiento');
+  if (ctxRendimiento && rankingData.length) {
+    const porRendimiento = [...rankingData].sort((a, b) => b.rendimiento_mh - a.rendimiento_mh);
+    new Chart(ctxRendimiento, {
+      type: 'bar',
+      data: {
+        labels: porRendimiento.map(r => r.operador),
+        datasets: [{
+          label: 'Rendimiento (m/h)',
+          data: porRendimiento.map(r => r.rendimiento_mh),
+          backgroundColor: '#2f6f4f',
+          borderRadius: 4,
+          maxBarThickness: 36,
+        }],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'm/h' }, grid: { color: '#eef0f3' } },
+          y: { grid: { display: false } },
+        },
+      },
+    });
+  }
+
   const ctx = document.getElementById('chartRanking');
   if (ctx && rankingData.length) {
     new Chart(ctx, {
