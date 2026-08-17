@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Geolocalización{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <h1>Geolocalización</h1>
+    <p class="muted">ZA-10707 — Zanjadora · Faena SQM Nueva Victoria, Pozo Almonte, Región de Tarapacá</p>
+  </div>
+</div>
+
+<div class="geo-demo-banner">
+  <strong>Demo:</strong> esta posición es simulada. En cuanto SQM comparta los datos de acceso al sistema de
+  geolocalización real del equipo, este mapa se conectará a la posición GPS efectiva de la máquina.
+</div>
+
+<section class="panel">
+  <div class="geo-layout">
+    <div id="mapaGeo" class="geo-map"></div>
+    <div class="geo-info">
+      <div class="geo-info-item">
+        <span class="geo-info-label">Estado</span>
+        <span class="geo-info-value"><span class="dot dot-ok"></span> Operativa (demo)</span>
+      </div>
+      <div class="geo-info-item">
+        <span class="geo-info-label">Coordenadas</span>
+        <span class="geo-info-value" id="geoCoords">—</span>
+      </div>
+      <div class="geo-info-item">
+        <span class="geo-info-label">Última actualización</span>
+        <span class="geo-info-value" id="geoUltimaActualizacion">—</span>
+      </div>
+      <div class="geo-info-item">
+        <span class="geo-info-label">Faena</span>
+        <span class="geo-info-value">SQM Nueva Victoria</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+  const BASE_LAT = -19.9042;
+  const BASE_LNG = -69.7286;
+
+  const mapa = L.map('mapaGeo').setView([BASE_LAT, BASE_LNG], 15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap',
+  }).addTo(mapa);
+
+  const marcador = L.marker([BASE_LAT, BASE_LNG]).addTo(mapa)
+    .bindPopup('Zanjadora ZA-10707<br>(posición demo)')
+    .openPopup();
+
+  function formatoCoord(v) {
+    return v.toFixed(5);
+  }
+
+  function actualizarPanel(lat, lng) {
+    document.getElementById('geoCoords').textContent = formatoCoord(lat) + ', ' + formatoCoord(lng);
+    document.getElementById('geoUltimaActualizacion').textContent = new Date().toLocaleTimeString('es-CL');
+  }
+
+  actualizarPanel(BASE_LAT, BASE_LNG);
+
+  // Simula un leve desplazamiento del equipo dentro de la faena, solo para la demo.
+  setInterval(() => {
+    const lat = BASE_LAT + (Math.random() - 0.5) * 0.004;
+    const lng = BASE_LNG + (Math.random() - 0.5) * 0.004;
+    marcador.setLatLng([lat, lng]);
+    actualizarPanel(lat, lng);
+  }, 5000);
+</script>
+{% endblock %}

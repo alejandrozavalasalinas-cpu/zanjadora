@@ -206,6 +206,12 @@ def ranking():
     )
 
 
+@app.route("/geolocalizacion")
+@login_required
+def geolocalizacion():
+    return render_template("geolocalizacion.html")
+
+
 @app.route("/formulario", methods=["GET", "POST"])
 @login_required
 @operador_required

@@ -17,6 +17,7 @@
     <nav class="nav">
       <a href="{{ url_for('tablero') }}" class="{{ 'active' if request.endpoint == 'tablero' else '' }}">Tablero</a>
       <a href="{{ url_for('ranking') }}" class="{{ 'active' if request.endpoint == 'ranking' else '' }}">Ranking</a>
+      <a href="{{ url_for('geolocalizacion') }}" class="{{ 'active' if request.endpoint == 'geolocalizacion' else '' }}">Geolocalización</a>
       {% if session.get('rol') != 'visor' %}
       <a href="{{ url_for('formulario') }}" class="{{ 'active' if request.endpoint == 'formulario' else '' }}">Nuevo registro</a>
       <a href="{{ url_for('registros') }}" class="{{ 'active' if request.endpoint == 'registros' else '' }}">Registro</a>
