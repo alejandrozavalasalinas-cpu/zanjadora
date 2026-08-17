@@ -535,17 +535,31 @@ def disponibilidad_diaria(anio=None, mes=None, poza=None):
 
 
 def disponibilidad_acumulada(anio=None, mes=None, poza=None):
-    """% de disponibilidad del mes, dividiendo por los días calendario reales
-    (los días sin registro cuentan como 0%, no se excluyen del cálculo)."""
-    ahora = datetime.now(SANTIAGO_TZ)
-    anio_ref = anio or ahora.year
-    mes_ref = mes or ahora.month
-    dias_en_mes = calendar.monthrange(anio_ref, mes_ref)[1]
-    if anio_ref == ahora.year and mes_ref == ahora.month:
-        dias_referencia = ahora.day
+    """% de disponibilidad del periodo, dividiendo por los días calendario reales
+    (los días sin registro cuentan como 0%, no se excluyen del cálculo).
+
+    Si se filtra un mes específico, usa ese mes calendario (hasta hoy si es el
+    mes real en curso). Si no hay mes filtrado (vista "Todos"), usa el rango
+    real de fechas con datos, para no comparar contra el mes calendario actual
+    cuando los registros cargados son de otro periodo."""
+    if mes:
+        ahora = datetime.now(SANTIAGO_TZ)
+        anio_ref = anio or ahora.year
+        dias_en_mes = calendar.monthrange(anio_ref, mes)[1]
+        if anio_ref == ahora.year and mes == ahora.month:
+            dias_referencia = ahora.day
+        else:
+            dias_referencia = dias_en_mes
+        filas = disponibilidad_diaria(anio=anio_ref, mes=mes, poza=poza)
     else:
-        dias_referencia = dias_en_mes
-    filas = disponibilidad_diaria(anio=anio_ref, mes=mes_ref, poza=poza)
+        filas = disponibilidad_diaria(anio=anio, mes=None, poza=poza)
+        if not filas:
+            return None
+        fechas = sorted(f["fecha"] for f in filas)
+        primer_dia = datetime.strptime(fechas[0], "%Y-%m-%d").date()
+        ultimo_dia = datetime.strptime(fechas[-1], "%Y-%m-%d").date()
+        dias_referencia = (ultimo_dia - primer_dia).days + 1
+
     total_horas = sum(f["horas_dia"] for f in filas)
     meta_horas = JORNADA_HORAS * dias_referencia
     pct = _safe_div(total_horas, meta_horas)
