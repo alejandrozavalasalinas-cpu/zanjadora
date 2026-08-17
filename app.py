@@ -448,6 +448,19 @@ def api_registros():
     return jsonify(models.listar_registros(limit=500, anio=anio, mes=mes, poza=poza))
 
 
+@app.route("/api/disponibilidad")
+@login_required
+def api_disponibilidad():
+    anio = request.args.get("anio", type=int)
+    mes = request.args.get("mes", type=int)
+    poza = request.args.get("poza") or None
+    return jsonify({
+        "dias": models.disponibilidad_diaria(anio=anio, mes=mes, poza=poza),
+        "acumulado_mes_pct": models.disponibilidad_acumulada_mes_actual(poza=poza),
+        "jornada_horas": models.JORNADA_HORAS,
+    })
+
+
 @app.route("/api/resumen")
 @login_required
 def api_resumen():

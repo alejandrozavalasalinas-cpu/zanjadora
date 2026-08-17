@@ -204,12 +204,15 @@
 </section>
 
 <section class="chart-grid">
-  <div class="panel chart-card">
+  <div class="panel chart-card chart-card-wide">
     <div class="chart-card-head">
       <h2>Disponibilidad diaria</h2>
-      <span class="chart-legend"><span class="dot dot-ok"></span>OK<span class="dot dot-alert"></span>Alerta</span>
+      <div class="chart-card-head-right">
+        <span class="chart-stat">Acumulado del mes: <strong id="dispAcumuladoMes">—</strong></span>
+        <span class="chart-legend"><span class="dot dot-ok"></span>OK<span class="dot dot-alert"></span>Alerta</span>
+      </div>
     </div>
-    <p class="muted">Horas operadas por día, coloreadas según el estado de mantención.</p>
+    <p class="muted">% de la jornada (9 h) operado por día, coloreado según el estado de mantención.</p>
     <div class="chart-canvas-wrap"><canvas id="chartDisponibilidad"></canvas></div>
   </div>
   <div class="panel chart-card">

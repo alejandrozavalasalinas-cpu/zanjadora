@@ -47,21 +47,46 @@ async function cargarGraficos() {
 
   const ctxDisponibilidad = document.getElementById('chartDisponibilidad');
   if (ctxDisponibilidad) {
-    const horasOperadas = ordenado.map(r => r.horas_operadas);
-    const colores = ordenado.map(r => r.estado_mant === 'Alerta' ? COLOR_ALERT : COLOR_OK);
+    const dispRes = await fetch('/api/disponibilidad' + (qs.toString() ? `?${qs}` : ''));
+    const disp = await dispRes.json();
+    const dias = disp.dias || [];
+    const dispLabels = dias.map(d => d.fecha);
+    const dispPct = dias.map(d => d.disponibilidad_pct);
+    const dispColores = dias.map(d => d.hay_alerta ? COLOR_ALERT : COLOR_OK);
+    const meta = dias.map(() => 100);
+
+    const acumuladoEl = document.getElementById('dispAcumuladoMes');
+    if (acumuladoEl) {
+      acumuladoEl.textContent = disp.acumulado_mes_pct != null
+        ? disp.acumulado_mes_pct.toFixed(1) + '%'
+        : '—';
+    }
+
     new Chart(ctxDisponibilidad, {
-      type: 'bar',
       data: {
-        labels,
-        datasets: [{
-          label: 'Horas operadas',
-          data: horasOperadas,
-          backgroundColor: colores,
-          borderRadius: 4,
-          maxBarThickness: 24,
-        }],
+        labels: dispLabels,
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Disponibilidad (%)',
+            data: dispPct,
+            backgroundColor: dispColores,
+            borderRadius: 4,
+            maxBarThickness: 28,
+          },
+          {
+            type: 'line',
+            label: 'Jornada (100%)',
+            data: meta,
+            borderColor: '#c3c2b7',
+            borderDash: [6, 4],
+            borderWidth: 1.5,
+            pointRadius: 0,
+            fill: false,
+          },
+        ],
       },
-      options: lineOptions('h operadas'),
+      options: lineOptions('% de 9 h'),
     });
   }
 

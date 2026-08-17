@@ -438,6 +438,42 @@ def roturas_identificadas_por_mes(anio=None, poza=None):
     return [dict(r) for r in rows]
 
 
+JORNADA_HORAS = 9
+
+
+def disponibilidad_diaria(anio=None, mes=None, poza=None):
+    where, valores = _filtro_periodo(anio, mes, poza)
+    conn = get_db()
+    rows = conn.execute(f"""
+        SELECT
+            fecha,
+            COALESCE(SUM(horas_operadas), 0) AS horas_dia,
+            MAX(CASE WHEN estado_mant = 'Alerta' THEN 1 ELSE 0 END) AS hay_alerta
+        FROM registros {where}
+        GROUP BY fecha
+        ORDER BY fecha
+    """, valores).fetchall()
+    conn.close()
+    resultado = []
+    for r in rows:
+        d = dict(r)
+        pct = _safe_div(d["horas_dia"], JORNADA_HORAS)
+        d["disponibilidad_pct"] = pct * 100 if pct is not None else 0
+        resultado.append(d)
+    return resultado
+
+
+def disponibilidad_acumulada_mes_actual(poza=None):
+    ahora = datetime.now(SANTIAGO_TZ)
+    dias = disponibilidad_diaria(anio=ahora.year, mes=ahora.month, poza=poza)
+    if not dias:
+        return None
+    total_horas = sum(d["horas_dia"] for d in dias)
+    meta_horas = JORNADA_HORAS * len(dias)
+    pct = _safe_div(total_horas, meta_horas)
+    return pct * 100 if pct is not None else None
+
+
 def ranking_operadores(anio=None, mes=None, poza=None):
     where, valores = _filtro_periodo(anio, mes, poza)
     condicion_operador = "operador IS NOT NULL AND operador != ''"
