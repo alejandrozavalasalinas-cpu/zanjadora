@@ -57,15 +57,9 @@ async function cargarGraficos() {
 
     const acumuladoEl = document.getElementById('dispAcumuladoMes');
     if (acumuladoEl) {
-      if (dias.length) {
-        const jornada = disp.jornada_horas || 9;
-        const totalHoras = dias.reduce((sum, d) => sum + (d.horas_dia || 0), 0);
-        const metaHoras = jornada * dias.length;
-        const acumuladoPct = metaHoras ? (totalHoras / metaHoras) * 100 : 0;
-        acumuladoEl.textContent = acumuladoPct.toFixed(1) + '%';
-      } else {
-        acumuladoEl.textContent = '—';
-      }
+      acumuladoEl.textContent = disp.acumulado_pct != null
+        ? disp.acumulado_pct.toFixed(1) + '%'
+        : '—';
     }
 
     new Chart(ctxDisponibilidad, {

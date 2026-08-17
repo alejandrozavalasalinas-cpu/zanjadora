@@ -1,6 +1,7 @@
 """Capa de datos: SQLite puro (sin ORM) para simplicidad y cero dependencias externas."""
 import sqlite3
 import os
+import calendar
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -461,6 +462,24 @@ def disponibilidad_diaria(anio=None, mes=None, poza=None):
         d["disponibilidad_pct"] = pct * 100 if pct is not None else 0
         resultado.append(d)
     return resultado
+
+
+def disponibilidad_acumulada(anio=None, mes=None, poza=None):
+    """% de disponibilidad del mes, dividiendo por los días calendario reales
+    (los días sin registro cuentan como 0%, no se excluyen del cálculo)."""
+    ahora = datetime.now(SANTIAGO_TZ)
+    anio_ref = anio or ahora.year
+    mes_ref = mes or ahora.month
+    dias_en_mes = calendar.monthrange(anio_ref, mes_ref)[1]
+    if anio_ref == ahora.year and mes_ref == ahora.month:
+        dias_referencia = ahora.day
+    else:
+        dias_referencia = dias_en_mes
+    filas = disponibilidad_diaria(anio=anio_ref, mes=mes_ref, poza=poza)
+    total_horas = sum(f["horas_dia"] for f in filas)
+    meta_horas = JORNADA_HORAS * dias_referencia
+    pct = _safe_div(total_horas, meta_horas)
+    return pct * 100 if pct is not None else None
 
 
 def ranking_operadores(anio=None, mes=None, poza=None):
