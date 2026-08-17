@@ -456,7 +456,6 @@ def api_disponibilidad():
     poza = request.args.get("poza") or None
     return jsonify({
         "dias": models.disponibilidad_diaria(anio=anio, mes=mes, poza=poza),
-        "acumulado_mes_pct": models.disponibilidad_acumulada_mes_actual(poza=poza),
         "jornada_horas": models.JORNADA_HORAS,
     })
 

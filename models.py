@@ -463,17 +463,6 @@ def disponibilidad_diaria(anio=None, mes=None, poza=None):
     return resultado
 
 
-def disponibilidad_acumulada_mes_actual(poza=None):
-    ahora = datetime.now(SANTIAGO_TZ)
-    dias = disponibilidad_diaria(anio=ahora.year, mes=ahora.month, poza=poza)
-    if not dias:
-        return None
-    total_horas = sum(d["horas_dia"] for d in dias)
-    meta_horas = JORNADA_HORAS * len(dias)
-    pct = _safe_div(total_horas, meta_horas)
-    return pct * 100 if pct is not None else None
-
-
 def ranking_operadores(anio=None, mes=None, poza=None):
     where, valores = _filtro_periodo(anio, mes, poza)
     condicion_operador = "operador IS NOT NULL AND operador != ''"
