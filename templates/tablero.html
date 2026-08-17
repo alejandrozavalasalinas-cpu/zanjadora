@@ -173,22 +173,22 @@
     <p class="muted">% de la jornada (9 h) operado por día, coloreado según el estado de mantención.</p>
     <div class="chart-canvas-wrap"><canvas id="chartDisponibilidad"></canvas></div>
   </div>
-  <div class="panel chart-card">
+  <div class="panel chart-card chart-card-wide">
+    <h2>Avance diario</h2>
+    <div class="chart-canvas-wrap"><canvas id="chartAvance"></canvas></div>
+  </div>
+  <div class="panel chart-card chart-card-wide">
     <h2>Mantención — horas restantes</h2>
     <p class="muted">Horas para la próxima mantención, con el umbral de aviso.</p>
     <div class="chart-canvas-wrap"><canvas id="chartMantencion"></canvas></div>
   </div>
   {% if session.get('rol') != 'visor' %}
-  <div class="panel chart-card">
+  <div class="panel chart-card chart-card-wide">
     <h2>Costo diario</h2>
     <div class="chart-canvas-wrap"><canvas id="chartCosto"></canvas></div>
   </div>
   {% endif %}
-  <div class="panel chart-card">
-    <h2>Avance diario</h2>
-    <div class="chart-canvas-wrap"><canvas id="chartAvance"></canvas></div>
-  </div>
-  <div class="panel chart-card">
+  <div class="panel chart-card chart-card-wide">
     <h2>Combustible diario</h2>
     <div class="chart-canvas-wrap"><canvas id="chartCombustible"></canvas></div>
   </div>
