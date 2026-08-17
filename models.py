@@ -211,6 +211,18 @@ def _safe_div(a, b):
         return None
 
 
+def _calcular_estado_mantencion(horometro_final, params):
+    hrs_para_mantencion = None
+    if horometro_final is not None:
+        hrs_para_mantencion = (params.get("intervalo_mantencion") or 0) - (
+            horometro_final - (params.get("horometro_ultima_mantencion") or 0)
+        )
+    estado_mant = "OK"
+    if hrs_para_mantencion is not None and hrs_para_mantencion <= (params.get("aviso_anticipado") or 0):
+        estado_mant = "Alerta"
+    return hrs_para_mantencion, estado_mant
+
+
 def calcular_derivados(reg, params):
     """Replica las fórmulas validadas contra la planilla original y el modelo de Power BI."""
     horas_operadas = None
@@ -232,14 +244,7 @@ def calcular_derivados(reg, params):
     costo_hora = _safe_div(costo_total, horas_operadas)
     costo_metro = _safe_div(costo_total, reg["avance_m"])
 
-    hrs_para_mantencion = None
-    if reg["horometro_final"] is not None:
-        hrs_para_mantencion = (params.get("intervalo_mantencion") or 0) - (
-            reg["horometro_final"] - (params.get("horometro_ultima_mantencion") or 0)
-        )
-    estado_mant = "OK"
-    if hrs_para_mantencion is not None and hrs_para_mantencion <= (params.get("aviso_anticipado") or 0):
-        estado_mant = "Alerta"
+    hrs_para_mantencion, estado_mant = _calcular_estado_mantencion(reg["horometro_final"], params)
 
     return {
         "horas_operadas": horas_operadas,
@@ -328,7 +333,15 @@ def listar_registros(limit=500, anio=None, mes=None, poza=None):
         (*valores, limit),
     ).fetchall()
     conn.close()
-    return [dict(r) for r in rows]
+    registros = [dict(r) for r in rows]
+
+    params = get_parametros()
+    params["horometro_ultima_mantencion"] = obtener_horometro_ultima_mantencion(params)
+    for reg in registros:
+        reg["hrs_para_mantencion"], reg["estado_mant"] = _calcular_estado_mantencion(
+            reg["horometro_final"], params
+        )
+    return registros
 
 
 def listar_anios_disponibles():
