@@ -714,6 +714,7 @@ def resumen_kpis(anio=None, mes=None, poza=None):
             COALESCE(SUM(avance_transversal_m), 0) AS avance_transversal_total,
             COALESCE(SUM(volumen_m3), 0) AS volumen_total,
             COALESCE(SUM(costo_total), 0) AS costo_total_acumulado,
+            COALESCE(SUM(costo_combustible), 0) AS costo_combustible_total,
             COALESCE(SUM(horas_sistema_automatico), 0) AS horas_sistema_automatico_total,
             COALESCE(SUM(picas_reemplazadas), 0) AS picas_reemplazadas_total,
             COALESCE(SUM(roturas_identificadas), 0) AS roturas_identificadas_total

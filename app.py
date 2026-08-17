@@ -135,6 +135,7 @@ def tablero():
     anio = request.args.get("anio", type=int)
     mes = request.args.get("mes", type=int)
     poza = request.args.get("poza") or None
+    params = models.get_parametros()
     kpis = models.resumen_kpis(anio=anio, mes=mes, poza=poza)
     registros = models.listar_registros(limit=20, anio=anio, mes=mes, poza=poza)
     anios_disponibles = models.listar_anios_disponibles()
@@ -155,7 +156,7 @@ def tablero():
             avance_transversal_pct = (kpis["avance_transversal_total"] / metros_transversal_totales_poza) * 100
         metros_totales_poza = (poza_info.get("metros_perimetral_totales") or 0) + (poza_info.get("metros_transversal_totales") or 0) if poza_info else 0
         if poza_info and metros_totales_poza and poza_info.get("altura_cm"):
-            ancho_zanja_cm = models.get_parametros().get("ancho_zanja_cm") or 0
+            ancho_zanja_cm = params.get("ancho_zanja_cm") or 0
             meta_m3_poza = metros_totales_poza * (poza_info["altura_cm"] / 100) * (ancho_zanja_cm / 100)
             if meta_m3_poza:
                 avance_m3_poza_pct = (kpis["volumen_total"] / meta_m3_poza) * 100
@@ -179,7 +180,8 @@ def tablero():
         avance_m3_poza_pct=avance_m3_poza_pct,
         picas_por_mes=picas_por_mes,
         roturas_por_mes=roturas_por_mes,
-        aviso_anticipado=models.get_parametros().get("aviso_anticipado") or 0,
+        aviso_anticipado=params.get("aviso_anticipado") or 0,
+        precio_combustible=params.get("precio_combustible") or 0,
     )
 
 

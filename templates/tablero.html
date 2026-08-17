@@ -200,7 +200,16 @@
   </div>
   {% endif %}
   <div class="panel chart-card chart-card-wide">
-    <h2>Combustible diario</h2>
+    <div class="chart-card-head">
+      <h2>Combustible diario</h2>
+      <div class="chart-card-head-right">
+        <span class="chart-stat">Precio: <strong>${{ precio_combustible | miles }}/L</strong></span>
+        {% if session.get('rol') != 'visor' %}
+        <span class="chart-stat">Acumulado: <strong>${{ kpis.costo_combustible_total | miles }}</strong></span>
+        {% endif %}
+      </div>
+    </div>
+    <p class="muted">Litros consumidos por día. Costo acumulado = litros totales × precio del combustible (${{ precio_combustible | miles }}/L).</p>
     <div class="chart-canvas-wrap"><canvas id="chartCombustible"></canvas></div>
   </div>
 </section>
