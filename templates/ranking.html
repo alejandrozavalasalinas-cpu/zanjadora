@@ -97,6 +97,35 @@
   const rankingData = {{ ranking|tojson }};
   const rankingPozasData = {{ ranking_pozas|tojson }};
 
+  function formatoMiles(valor, decimales) {
+    if (valor == null) return '';
+    return valor.toLocaleString('es-CL', { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
+  }
+
+  const valorEnBarraPlugin = {
+    id: 'valorEnBarra',
+    afterDatasetsDraw(chart) {
+      const cfg = chart.options.plugins && chart.options.plugins.valorEnBarra;
+      if (!cfg) return;
+      const { ctx, chartArea } = chart;
+      chart.data.datasets.forEach((dataset, di) => {
+        chart.getDatasetMeta(di).data.forEach((bar, i) => {
+          const valor = dataset.data[i];
+          if (valor == null) return;
+          const texto = formatoMiles(valor, cfg.decimales || 0) + (cfg.sufijo || '');
+          ctx.save();
+          ctx.fillStyle = '#4a4a42';
+          ctx.font = '600 12px system-ui, -apple-system, sans-serif';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(texto, Math.min(bar.x + 8, chartArea.right - 6), bar.y);
+          ctx.restore();
+        });
+      });
+    },
+  };
+  Chart.register(valorEnBarraPlugin);
+
   const ctxRendimiento = document.getElementById('chartRendimiento');
   if (ctxRendimiento && rankingData.length) {
     const porRendimiento = [...rankingData].sort((a, b) => b.rendimiento_mh - a.rendimiento_mh);
@@ -116,7 +145,11 @@
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
+        layout: { padding: { right: 48 } },
+        plugins: {
+          legend: { display: false },
+          valorEnBarra: { decimales: 2, sufijo: ' m/h' },
+        },
         scales: {
           x: { title: { display: true, text: 'm/h' }, grid: { color: '#eef0f3' } },
           y: { grid: { display: false } },
@@ -143,7 +176,11 @@
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
+        layout: { padding: { right: 64 } },
+        plugins: {
+          legend: { display: false },
+          valorEnBarra: { decimales: 0, sufijo: ' m' },
+        },
         scales: {
           x: { title: { display: true, text: 'm lineal' }, grid: { color: '#eef0f3' } },
           y: { grid: { display: false } },
@@ -171,7 +208,11 @@
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
+        layout: { padding: { right: 48 } },
+        plugins: {
+          legend: { display: false },
+          valorEnBarra: { decimales: 2, sufijo: ' m/h' },
+        },
         scales: {
           x: { title: { display: true, text: 'm/h' }, grid: { color: '#eef0f3' } },
           y: { grid: { display: false } },
