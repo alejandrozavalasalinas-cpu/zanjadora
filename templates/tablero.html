@@ -272,7 +272,8 @@
         <tr>
           <th>Fecha</th><th>Turno</th><th>Operador</th><th>Poza</th><th>Horas</th>
           <th>Combustible (L)</th><th>Avance (m)</th><th>Rendim. (m/h)</th>
-          <th>Costo total</th><th>Estado mant.</th><th>Observaciones</th>
+          {% if session.get('rol') != 'visor' %}<th>Costo total</th>{% endif %}
+          <th>Estado mant.</th><th>Observaciones</th>
         </tr>
       </thead>
       <tbody>
@@ -286,7 +287,7 @@
           <td>{{ r.combustible_l | miles if r.combustible_l is not none else '—' }}</td>
           <td>{{ r.avance_m | miles if r.avance_m is not none else '—' }}</td>
           <td>{{ r.rendimiento_mh | miles(2) if r.rendimiento_mh is not none else '—' }}</td>
-          <td>${{ r.costo_total | miles if r.costo_total is not none else '—' }}</td>
+          {% if session.get('rol') != 'visor' %}<td>${{ r.costo_total | miles if r.costo_total is not none else '—' }}</td>{% endif %}
           <td><span class="badge {{ 'badge-alert' if r.estado_mant == 'Alerta' else 'badge-ok' }}">{{ r.estado_mant or '—' }}</span></td>
           <td class="obs">{{ r.observaciones or '' }}</td>
         </tr>
