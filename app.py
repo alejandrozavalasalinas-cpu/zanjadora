@@ -24,6 +24,18 @@ os.makedirs(MANTENCIONES_DIR, exist_ok=True)
 models.init_db()
 
 
+@app.template_filter("miles")
+def formato_miles(value, decimales=0):
+    """Formatea un número con punto como separador de miles y coma como decimal (formato chileno)."""
+    if value is None:
+        return "—"
+    try:
+        texto = f"{float(value):,.{decimales}f}"
+    except (TypeError, ValueError):
+        return "—"
+    return texto.replace(",", "X").replace(".", ",").replace("X", ".")
+
+
 # ---------- Autenticación simple (contraseña compartida) ----------
 
 def login_required(view):

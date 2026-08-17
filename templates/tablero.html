@@ -59,7 +59,7 @@
       <span class="poza-progreso-pct">{{ "%.1f"|format(avance_perimetral_pct) }}%</span>
     </div>
     <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [avance_perimetral_pct, 100] | min }}%"></div></div>
-    <p class="muted">{{ "{:,.0f}".format(kpis.avance_perimetral_total) }} m de {{ "{:,.0f}".format(metros_perimetral_totales_poza) }} m totales</p>
+    <p class="muted">{{ kpis.avance_perimetral_total | miles }} m de {{ metros_perimetral_totales_poza | miles }} m totales</p>
   </div>
   {% endif %}
   {% if avance_transversal_pct is not none %}
@@ -69,7 +69,7 @@
       <span class="poza-progreso-pct">{{ "%.1f"|format(avance_transversal_pct) }}%</span>
     </div>
     <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [avance_transversal_pct, 100] | min }}%"></div></div>
-    <p class="muted">{{ "{:,.0f}".format(kpis.avance_transversal_total) }} m de {{ "{:,.0f}".format(metros_transversal_totales_poza) }} m totales</p>
+    <p class="muted">{{ kpis.avance_transversal_total | miles }} m de {{ metros_transversal_totales_poza | miles }} m totales</p>
   </div>
   {% endif %}
   {% if avance_m3_poza_pct is not none %}
@@ -79,7 +79,7 @@
       <span class="poza-progreso-pct">{{ "%.1f"|format(avance_m3_poza_pct) }}%</span>
     </div>
     <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [avance_m3_poza_pct, 100] | min }}%"></div></div>
-    <p class="muted">{{ "{:,.0f}".format(kpis.volumen_total) }} m³ de {{ "{:,.0f}".format(meta_m3_poza) }} m³ totales</p>
+    <p class="muted">{{ kpis.volumen_total | miles }} m³ de {{ meta_m3_poza | miles }} m³ totales</p>
   </div>
   {% else %}
   <p class="muted">Falta la altura de corte de esta poza (o el ancho de zanja en Parámetros) para calcular el avance en m³.</p>
@@ -94,7 +94,7 @@
       <span class="poza-progreso-pct">{{ "%.1f"|format(kpis.utilizacion_automatico_pct) }}%</span>
     </div>
     <div class="progress-bar"><div class="progress-bar-fill" style="width: {{ [kpis.utilizacion_automatico_pct, 100] | min }}%"></div></div>
-    <p class="muted">{{ "%.1f"|format(kpis.horas_sistema_automatico_total) }} h de {{ "%.1f"|format(kpis.horas_operadas_total) }} h operadas</p>
+    <p class="muted">{{ kpis.horas_sistema_automatico_total | miles(1) }} h de {{ kpis.horas_operadas_total | miles(1) }} h operadas</p>
   </div>
   {% endif %}
 </section>
@@ -103,7 +103,7 @@
 <section class="kpi-grid">
   <div class="kpi-card">
     <span class="kpi-label">Horas operadas (total)</span>
-    <span class="kpi-value">{{ "%.1f"|format(kpis.horas_operadas_total) }} h</span>
+    <span class="kpi-value">{{ kpis.horas_operadas_total | miles(1) }} h</span>
   </div>
   <div class="kpi-card">
     <span class="kpi-label">% Utilización sistema automático</span>
@@ -115,7 +115,7 @@
   </div>
   <div class="kpi-card">
     <span class="kpi-label">Combustible total</span>
-    <span class="kpi-value">{{ "%.0f"|format(kpis.combustible_total) }} L</span>
+    <span class="kpi-value">{{ kpis.combustible_total | miles }} L</span>
   </div>
   <div class="kpi-card">
     <span class="kpi-label">Consumo promedio</span>
@@ -131,7 +131,7 @@
   </div>
   <div class="kpi-card">
     <span class="kpi-label">Avance total</span>
-    <span class="kpi-value">{{ "%.0f"|format(kpis.avance_total) }} m</span>
+    <span class="kpi-value">{{ kpis.avance_total | miles }} m</span>
   </div>
   <div class="kpi-card">
     <span class="kpi-label">Rendimiento promedio</span>
@@ -140,24 +140,24 @@
   {% if session.get('rol') != 'visor' %}
   <div class="kpi-card">
     <span class="kpi-label">Costo total acumulado</span>
-    <span class="kpi-value">${{ "{:,.0f}".format(kpis.costo_total_acumulado) }}</span>
+    <span class="kpi-value">${{ kpis.costo_total_acumulado | miles }}</span>
   </div>
   <div class="kpi-card">
     <span class="kpi-label">Costo por hora</span>
-    <span class="kpi-value">${{ "{:,.0f}".format(kpis.costo_por_hora) }}</span>
+    <span class="kpi-value">${{ kpis.costo_por_hora | miles }}</span>
   </div>
   <div class="kpi-card">
     <span class="kpi-label">Costo por metro</span>
-    <span class="kpi-value">${{ "{:,.0f}".format(kpis.costo_por_metro) }}</span>
+    <span class="kpi-value">${{ kpis.costo_por_metro | miles }}</span>
   </div>
   {% endif %}
   <div class="kpi-card">
     <span class="kpi-label">Picas reemplazadas</span>
-    <span class="kpi-value">{{ "%.0f"|format(kpis.picas_reemplazadas_total) }}</span>
+    <span class="kpi-value">{{ kpis.picas_reemplazadas_total | miles }}</span>
   </div>
   <div class="kpi-card {{ 'kpi-alert' if poza_sel else '' }}">
     <span class="kpi-label">Roturas identificadas</span>
-    <span class="kpi-value">{{ "%.0f"|format(kpis.roturas_identificadas_total) }}</span>
+    <span class="kpi-value">{{ kpis.roturas_identificadas_total | miles }}</span>
   </div>
 </section>
 
@@ -210,7 +210,7 @@
         {% for m in picas_por_mes %}
         <tr>
           <td>{{ meses[m.mes[5:7]|int - 1][1] }} {{ m.mes[:4] }}</td>
-          <td>{{ "%.0f"|format(m.total) }}</td>
+          <td>{{ m.total | miles }}</td>
         </tr>
         {% else %}
         <tr><td colspan="2" class="empty">Sin datos todavía.</td></tr>
@@ -231,7 +231,7 @@
         {% for m in roturas_por_mes %}
         <tr>
           <td>{{ meses[m.mes[5:7]|int - 1][1] }} {{ m.mes[:4] }}</td>
-          <td>{{ "%.0f"|format(m.total) }}</td>
+          <td>{{ m.total | miles }}</td>
         </tr>
         {% else %}
         <tr><td colspan="2" class="empty">Sin datos todavía.</td></tr>
@@ -267,11 +267,11 @@
           <td>{{ r.turno or '—' }}</td>
           <td>{{ r.operador or '—' }}</td>
           <td>{{ r.poza or '—' }}</td>
-          <td>{{ "%.1f"|format(r.horas_operadas) if r.horas_operadas is not none else '—' }}</td>
-          <td>{{ "%.0f"|format(r.combustible_l) if r.combustible_l is not none else '—' }}</td>
-          <td>{{ "%.0f"|format(r.avance_m) if r.avance_m is not none else '—' }}</td>
-          <td>{{ "%.2f"|format(r.rendimiento_mh) if r.rendimiento_mh is not none else '—' }}</td>
-          <td>${{ "{:,.0f}".format(r.costo_total) if r.costo_total is not none else '—' }}</td>
+          <td>{{ r.horas_operadas | miles(1) if r.horas_operadas is not none else '—' }}</td>
+          <td>{{ r.combustible_l | miles if r.combustible_l is not none else '—' }}</td>
+          <td>{{ r.avance_m | miles if r.avance_m is not none else '—' }}</td>
+          <td>{{ r.rendimiento_mh | miles(2) if r.rendimiento_mh is not none else '—' }}</td>
+          <td>${{ r.costo_total | miles if r.costo_total is not none else '—' }}</td>
           <td><span class="badge {{ 'badge-alert' if r.estado_mant == 'Alerta' else 'badge-ok' }}">{{ r.estado_mant or '—' }}</span></td>
           <td class="obs">{{ r.observaciones or '' }}</td>
         </tr>
