@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Registro{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <h1>Todos los registros</h1>
+    <p class="muted">
+      {{ registros|length }} registro(s)
+      {%- if anio_sel or mes_sel or poza_sel %} · Periodo: {{ meses[mes_sel - 1][1] ~ ' ' if mes_sel else '' }}{{ anio_sel or 'todos los años' }}{% if poza_sel %} · Poza: {{ poza_sel }}{% endif %}{% endif %}
+    </p>
+  </div>
+  <div class="page-head-actions">
+    <a class="btn-primary" href="{{ url_for('formulario') }}">+ Nuevo registro</a>
+  </div>
+</div>
+
+<form method="get" class="filtro-periodo">
+  <label>Año
+    <select name="anio" onchange="this.form.submit()">
+      <option value="">Todos</option>
+      {% for a in anios_disponibles %}
+      <option value="{{ a }}" {{ 'selected' if anio_sel == a else '' }}>{{ a }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Mes
+    <select name="mes" onchange="this.form.submit()">
+      <option value="">Todos</option>
+      {% for num, nombre in meses %}
+      <option value="{{ num }}" {{ 'selected' if mes_sel == num else '' }}>{{ nombre }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Poza
+    <select name="poza" onchange="this.form.submit()">
+      <option value="">Todas</option>
+      {% for p in pozas_disponibles %}
+      <option value="{{ p }}" {{ 'selected' if poza_sel == p else '' }}>{{ p }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  {% if anio_sel or mes_sel or poza_sel %}
+  <a href="{{ url_for('registros') }}" class="btn-link">Limpiar filtro</a>
+  {% endif %}
+</form>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Turno</th><th>Operador</th><th>Poza</th><th>Horas</th>
+          <th>Combustible (L)</th><th>Avance (m)</th><th>Rendim. (m/h)</th>
+          <th>Costo total</th><th>Estado mant.</th><th>Observaciones</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in registros %}
+        <tr>
+          <td>{{ r.fecha }}</td>
+          <td>{{ r.turno or '—' }}</td>
+          <td>{{ r.operador or '—' }}</td>
+          <td>{{ r.poza or '—' }}</td>
+          <td>{{ "%.1f"|format(r.horas_operadas) if r.horas_operadas is not none else '—' }}</td>
+          <td>{{ "%.0f"|format(r.combustible_l) if r.combustible_l is not none else '—' }}</td>
+          <td>{{ "%.0f"|format(r.avance_m) if r.avance_m is not none else '—' }}</td>
+          <td>{{ "%.2f"|format(r.rendimiento_mh) if r.rendimiento_mh is not none else '—' }}</td>
+          <td>${{ "{:,.0f}".format(r.costo_total) if r.costo_total is not none else '—' }}</td>
+          <td><span class="badge {{ 'badge-alert' if r.estado_mant == 'Alerta' else 'badge-ok' }}">{{ r.estado_mant or '—' }}</span></td>
+          <td class="obs">{{ r.observaciones or '' }}</td>
+          <td class="row-actions">
+            <a href="{{ url_for('editar_registro', reg_id=r.id) }}" class="btn-link">Editar</a>
+            <form method="post" action="{{ url_for('eliminar_registro', reg_id=r.id) }}" onsubmit="return confirm('¿Eliminar este registro?');">
+              <button type="submit" class="btn-link-danger">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="12" class="empty">Todavía no hay registros. <a href="{{ url_for('formulario') }}">Ingresa el primero</a>.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -105,7 +105,7 @@ def tablero():
     mes = request.args.get("mes", type=int)
     poza = request.args.get("poza") or None
     kpis = models.resumen_kpis(anio=anio, mes=mes, poza=poza)
-    registros = models.listar_registros(limit=200, anio=anio, mes=mes, poza=poza)
+    registros = models.listar_registros(limit=20, anio=anio, mes=mes, poza=poza)
     anios_disponibles = models.listar_anios_disponibles()
     pozas_disponibles = models.listar_pozas_disponibles()
     avance_perimetral_pct = None
@@ -220,6 +220,25 @@ def formulario():
         registros=models.listar_registros(limit=15),
         pozas=models.listar_pozas(),
         ultimo_horometro=models.ultimo_horometro_final(),
+    )
+
+
+@app.route("/registros")
+@login_required
+@operador_required
+def registros():
+    anio = request.args.get("anio", type=int)
+    mes = request.args.get("mes", type=int)
+    poza = request.args.get("poza") or None
+    return render_template(
+        "registros.html",
+        registros=models.listar_registros(limit=100000, anio=anio, mes=mes, poza=poza),
+        meses=MESES,
+        anios_disponibles=models.listar_anios_disponibles(),
+        pozas_disponibles=models.listar_pozas_disponibles(),
+        anio_sel=anio,
+        mes_sel=mes,
+        poza_sel=poza,
     )
 
 
