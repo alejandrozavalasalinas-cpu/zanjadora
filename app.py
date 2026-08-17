@@ -1,18 +1,25 @@
 import csv
 import io
 import os
+import uuid
 from datetime import datetime
 from functools import wraps
 
 from flask import (
-    Flask, render_template, request, redirect, url_for, session, jsonify, flash, Response
+    Flask, render_template, request, redirect, url_for, session, jsonify, flash, Response,
+    send_from_directory, abort,
 )
+from werkzeug.utils import secure_filename
 
 import models
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "cambia-esta-clave-en-produccion")
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB, para los PDF de respaldo
 APP_PASSWORD = os.environ.get("APP_PASSWORD", "zanjadora2026")
+
+MANTENCIONES_DIR = os.path.join(os.path.dirname(models.DB_PATH), "mantenciones_pdfs")
+os.makedirs(MANTENCIONES_DIR, exist_ok=True)
 
 models.init_db()
 
@@ -382,6 +389,7 @@ def parametros():
         params=models.get_parametros(),
         pozas=models.listar_pozas(),
         operadores=models.listar_operadores(),
+        mantenciones=models.listar_mantenciones(),
     )
 
 
@@ -435,6 +443,58 @@ def eliminar_operador(operador_id):
     models.eliminar_operador(operador_id)
     flash("Operador eliminado.", "success")
     return redirect(url_for("parametros"))
+
+
+@app.route("/parametros/mantenciones", methods=["POST"])
+@login_required
+@operador_required
+def crear_mantencion():
+    try:
+        fecha = request.form.get("fecha")
+        horometro = float(request.form.get("horometro") or 0)
+        descripcion = request.form.get("descripcion")
+        if not fecha:
+            raise ValueError("La fecha es obligatoria.")
+
+        archivo = request.files.get("pdf")
+        pdf_filename = None
+        if archivo and archivo.filename:
+            if not archivo.filename.lower().endswith(".pdf"):
+                raise ValueError("El respaldo debe ser un archivo PDF.")
+            cabecera = archivo.read(5)
+            archivo.seek(0)
+            if cabecera != b"%PDF-":
+                raise ValueError("El archivo no es un PDF válido.")
+            pdf_filename = f"{uuid.uuid4().hex}_{secure_filename(archivo.filename)}"
+            archivo.save(os.path.join(MANTENCIONES_DIR, pdf_filename))
+
+        models.crear_mantencion(fecha, horometro, descripcion, pdf_filename)
+        flash("Mantención registrada.", "success")
+    except ValueError as e:
+        flash(f"Error: {e}", "error")
+    return redirect(url_for("parametros"))
+
+
+@app.route("/parametros/mantenciones/<int:mantencion_id>/eliminar", methods=["POST"])
+@login_required
+@operador_required
+def eliminar_mantencion(mantencion_id):
+    pdf_filename = models.eliminar_mantencion(mantencion_id)
+    if pdf_filename:
+        ruta = os.path.join(MANTENCIONES_DIR, pdf_filename)
+        if os.path.exists(ruta):
+            os.remove(ruta)
+    flash("Mantención eliminada.", "success")
+    return redirect(url_for("parametros"))
+
+
+@app.route("/mantenciones/<int:mantencion_id>/pdf")
+@login_required
+def ver_pdf_mantencion(mantencion_id):
+    mantencion = models.obtener_mantencion(mantencion_id)
+    if not mantencion or not mantencion.get("pdf_filename"):
+        abort(404)
+    return send_from_directory(MANTENCIONES_DIR, mantencion["pdf_filename"])
 
 
 # ---------- API JSON (para el gráfico del tablero) ----------

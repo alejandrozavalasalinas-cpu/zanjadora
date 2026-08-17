@@ -125,6 +125,16 @@ def init_db():
             creado_en TEXT
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS mantenciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fecha TEXT NOT NULL,
+            horometro REAL NOT NULL,
+            descripcion TEXT,
+            pdf_filename TEXT,
+            creado_en TEXT
+        )
+    """)
     cols_pozas = [r["name"] for r in conn.execute("PRAGMA table_info(pozas)").fetchall()]
     if "altura_cm" not in cols_pozas:
         conn.execute("ALTER TABLE pozas ADD COLUMN altura_cm REAL")
@@ -248,6 +258,7 @@ def calcular_derivados(reg, params):
 
 def crear_registro(data):
     params = get_parametros()
+    params["horometro_ultima_mantencion"] = obtener_horometro_ultima_mantencion(params)
     derivados = calcular_derivados(data, params)
     conn = get_db()
     cols = [
@@ -272,6 +283,7 @@ def crear_registro(data):
 
 def actualizar_registro(reg_id, data):
     params = get_parametros()
+    params["horometro_ultima_mantencion"] = obtener_horometro_ultima_mantencion(params)
     derivados = calcular_derivados(data, params)
     conn = get_db()
     cols = [
@@ -395,6 +407,51 @@ def eliminar_operador(operador_id):
     conn.execute("DELETE FROM operadores WHERE id = ?", (operador_id,))
     conn.commit()
     conn.close()
+
+
+def crear_mantencion(fecha, horometro, descripcion, pdf_filename):
+    conn = get_db()
+    conn.execute(
+        """INSERT INTO mantenciones (fecha, horometro, descripcion, pdf_filename, creado_en)
+           VALUES (?, ?, ?, ?, ?)""",
+        (fecha, horometro, descripcion, pdf_filename, datetime.utcnow().isoformat()),
+    )
+    conn.commit()
+    conn.close()
+
+
+def listar_mantenciones():
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM mantenciones ORDER BY horometro DESC").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def obtener_mantencion(mantencion_id):
+    conn = get_db()
+    row = conn.execute("SELECT * FROM mantenciones WHERE id = ?", (mantencion_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def eliminar_mantencion(mantencion_id):
+    conn = get_db()
+    row = conn.execute(
+        "SELECT pdf_filename FROM mantenciones WHERE id = ?", (mantencion_id,)
+    ).fetchone()
+    conn.execute("DELETE FROM mantenciones WHERE id = ?", (mantencion_id,))
+    conn.commit()
+    conn.close()
+    return row["pdf_filename"] if row else None
+
+
+def obtener_horometro_ultima_mantencion(params):
+    conn = get_db()
+    row = conn.execute("SELECT MAX(horometro) AS h FROM mantenciones").fetchone()
+    conn.close()
+    if row and row["h"] is not None:
+        return row["h"]
+    return params.get("horometro_ultima_mantencion") or 0
 
 
 def picas_reemplazadas_por_mes(anio=None, poza=None):

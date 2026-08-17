@@ -152,4 +152,54 @@
     </div>
   </form>
 </section>
+
+<section class="panel">
+  <h2>Mantenciones realizadas</h2>
+  <p class="muted">Registra cada mantención con el horómetro en que se hizo — el tablero usa la más reciente para calcular las horas restantes para la próxima mantención. Puedes adjuntar un PDF de respaldo (factura, checklist, etc.).</p>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>Fecha</th><th>Horómetro</th><th>Descripción</th><th>PDF</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for m in mantenciones %}
+        <tr>
+          <td>{{ m.fecha }}</td>
+          <td>{{ "{:,.0f}".format(m.horometro) }}</td>
+          <td class="obs">{{ m.descripcion or '' }}</td>
+          <td>
+            {% if m.pdf_filename %}
+            <a href="{{ url_for('ver_pdf_mantencion', mantencion_id=m.id) }}" class="btn-link" target="_blank" rel="noopener">Ver PDF</a>
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('eliminar_mantencion', mantencion_id=m.id) }}" onsubmit="return confirm('¿Eliminar esta mantención?');">
+              <button type="submit" class="btn-link-danger">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">Todavía no hay mantenciones registradas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <form method="post" action="{{ url_for('crear_mantencion') }}" class="grid-form poza-form" enctype="multipart/form-data">
+    <label>Fecha
+      <input type="date" name="fecha" required>
+    </label>
+    <label>Horómetro
+      <input type="number" step="0.1" name="horometro" placeholder="Ej: 1250" required>
+    </label>
+    <label>Descripción
+      <input type="text" name="descripcion" placeholder="Opcional">
+    </label>
+    <label>Respaldo (PDF)
+      <input type="file" name="pdf" accept="application/pdf">
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="btn-secondary">Agregar mantención</button>
+    </div>
+  </form>
+</section>
 {% endblock %}
