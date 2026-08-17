@@ -374,7 +374,7 @@ def parametros():
             "aviso_anticipado", "profundidad_zanja_cm", "ancho_zanja_cm",
         ]
         campos_txt = ["codigo_interno", "nombre", "marca", "modelo", "numero_serie"]
-        data = {c: request.form.get(c) for c in campos_txt}
+        data = {c: request.form.get(c) or "" for c in campos_txt}
         for c in campos_num:
             try:
                 data[c] = float(request.form.get(c) or 0)

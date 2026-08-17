@@ -13,55 +13,55 @@
   <form method="post" class="grid-form">
     <h2 class="span-2">Identificación</h2>
     <label>Código interno
-      <input type="text" name="codigo_interno" value="{{ params.codigo_interno }}">
+      <input type="text" name="codigo_interno" value="{{ params.codigo_interno if params.codigo_interno is not none else '' }}">
     </label>
     <label>Nombre / descripción
-      <input type="text" name="nombre" value="{{ params.nombre }}">
+      <input type="text" name="nombre" value="{{ params.nombre if params.nombre is not none else '' }}">
     </label>
     <label>Marca
-      <input type="text" name="marca" value="{{ params.marca }}">
+      <input type="text" name="marca" value="{{ params.marca if params.marca is not none else '' }}">
     </label>
     <label>Modelo
-      <input type="text" name="modelo" value="{{ params.modelo }}">
+      <input type="text" name="modelo" value="{{ params.modelo if params.modelo is not none else '' }}">
     </label>
     <label>Año
-      <input type="number" name="anio" value="{{ params.anio }}">
+      <input type="number" name="anio" value="{{ params.anio if params.anio is not none else '' }}">
     </label>
     <label>N° de serie
-      <input type="text" name="numero_serie" value="{{ params.numero_serie }}">
+      <input type="text" name="numero_serie" value="{{ params.numero_serie if params.numero_serie is not none else '' }}">
     </label>
 
     <h2 class="span-2">Supuestos de costo y operación</h2>
     <label>Precio combustible ($/L)
-      <input type="number" step="0.01" name="precio_combustible" value="{{ params.precio_combustible }}">
+      <input type="number" step="0.01" name="precio_combustible" value="{{ params.precio_combustible if params.precio_combustible is not none else '' }}">
     </label>
     <label>Costo operador ($/h)
-      <input type="number" step="0.01" name="costo_operador_hora" value="{{ params.costo_operador_hora }}">
+      <input type="number" step="0.01" name="costo_operador_hora" value="{{ params.costo_operador_hora if params.costo_operador_hora is not none else '' }}">
     </label>
     <label>Consumo objetivo (L/h)
-      <input type="number" step="0.01" name="consumo_objetivo" value="{{ params.consumo_objetivo }}">
+      <input type="number" step="0.01" name="consumo_objetivo" value="{{ params.consumo_objetivo if params.consumo_objetivo is not none else '' }}">
     </label>
     <label>Rendimiento objetivo (m lineal/h)
-      <input type="number" step="0.01" name="rendimiento_objetivo" value="{{ params.rendimiento_objetivo }}">
+      <input type="number" step="0.01" name="rendimiento_objetivo" value="{{ params.rendimiento_objetivo if params.rendimiento_objetivo is not none else '' }}">
     </label>
 
     <h2 class="span-2">Mantención</h2>
     <label>Intervalo de mantención (h)
-      <input type="number" step="0.1" name="intervalo_mantencion" value="{{ params.intervalo_mantencion }}">
+      <input type="number" step="0.1" name="intervalo_mantencion" value="{{ params.intervalo_mantencion if params.intervalo_mantencion is not none else '' }}">
     </label>
     <label>Horómetro de última mantención (h)
-      <input type="number" step="0.1" name="horometro_ultima_mantencion" value="{{ params.horometro_ultima_mantencion }}">
+      <input type="number" step="0.1" name="horometro_ultima_mantencion" value="{{ params.horometro_ultima_mantencion if params.horometro_ultima_mantencion is not none else '' }}">
     </label>
     <label>Aviso anticipado (h antes)
-      <input type="number" step="0.1" name="aviso_anticipado" value="{{ params.aviso_anticipado }}">
+      <input type="number" step="0.1" name="aviso_anticipado" value="{{ params.aviso_anticipado if params.aviso_anticipado is not none else '' }}">
     </label>
 
     <h2 class="span-2">Geometría de zanja (para volumen excavado)</h2>
     <label>Profundidad de zanja por defecto (cm)
-      <input type="number" step="0.1" name="profundidad_zanja_cm" value="{{ params.profundidad_zanja_cm }}">
+      <input type="number" step="0.1" name="profundidad_zanja_cm" value="{{ params.profundidad_zanja_cm if params.profundidad_zanja_cm is not none else '' }}">
     </label>
     <label>Ancho de zanja (cm)
-      <input type="number" step="0.1" name="ancho_zanja_cm" value="{{ params.ancho_zanja_cm }}">
+      <input type="number" step="0.1" name="ancho_zanja_cm" value="{{ params.ancho_zanja_cm if params.ancho_zanja_cm is not none else '' }}">
     </label>
 
     <div class="span-2 form-actions">
