@@ -38,6 +38,18 @@ def operador_required(view):
     return wrapped
 
 
+def obtener_ip_cliente():
+    # Fly.io entrega la IP real del cliente en este header (el proxy interno
+    # queda en X-Forwarded-For/remote_addr).
+    ip = request.headers.get("Fly-Client-IP")
+    if ip:
+        return ip
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.remote_addr
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     error = None
@@ -49,7 +61,7 @@ def login():
             session["autenticado"] = True
             session["usuario"] = usuario["nombre"]
             session["rol"] = usuario["rol"]
-            models.registrar_acceso(session["usuario"])
+            models.registrar_acceso(session["usuario"], ip=obtener_ip_cliente())
             destino = url_for("tablero") if usuario["rol"] == "visor" else (request.args.get("next") or url_for("tablero"))
             return redirect(destino)
         error = "Usuario o contraseña incorrectos."

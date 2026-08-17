@@ -93,7 +93,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS accesos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
-            fecha_hora TEXT NOT NULL
+            fecha_hora TEXT NOT NULL,
+            ip TEXT
         )
     """)
     conn.execute("""
@@ -144,6 +145,10 @@ def init_db():
         conn.execute("ALTER TABLE registros ADD COLUMN avance_perimetral_m REAL")
     if "avance_transversal_m" not in cols_registros:
         conn.execute("ALTER TABLE registros ADD COLUMN avance_transversal_m REAL")
+
+    cols_accesos = [r["name"] for r in conn.execute("PRAGMA table_info(accesos)").fetchall()]
+    if "ip" not in cols_accesos:
+        conn.execute("ALTER TABLE accesos ADD COLUMN ip TEXT")
 
     row = conn.execute("SELECT COUNT(*) c FROM parametros").fetchone()
     if row["c"] == 0:
@@ -512,11 +517,11 @@ def verificar_usuario(nombre, password):
     return None
 
 
-def registrar_acceso(nombre):
+def registrar_acceso(nombre, ip=None):
     conn = get_db()
     conn.execute(
-        "INSERT INTO accesos (nombre, fecha_hora) VALUES (?, ?)",
-        (nombre, datetime.utcnow().isoformat()),
+        "INSERT INTO accesos (nombre, fecha_hora, ip) VALUES (?, ?, ?)",
+        (nombre, datetime.utcnow().isoformat(), ip),
     )
     conn.commit()
     conn.close()

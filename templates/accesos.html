@@ -13,7 +13,7 @@
   <div class="table-wrap">
     <table class="data-table">
       <thead>
-        <tr><th>Fecha</th><th>Hora (Chile)</th><th>Nombre</th></tr>
+        <tr><th>Fecha</th><th>Hora (Chile)</th><th>Nombre</th><th>IP</th></tr>
       </thead>
       <tbody>
         {% for a in accesos %}
@@ -21,9 +21,10 @@
           <td>{{ a.fecha_hora_cl[:10] }}</td>
           <td>{{ a.fecha_hora_cl[11:16] }}</td>
           <td>{{ a.nombre }}</td>
+          <td>{{ a.ip or '—' }}</td>
         </tr>
         {% else %}
-        <tr><td colspan="3" class="empty">Todavía no hay accesos registrados.</td></tr>
+        <tr><td colspan="4" class="empty">Todavía no hay accesos registrados.</td></tr>
         {% endfor %}
       </tbody>
     </table>
