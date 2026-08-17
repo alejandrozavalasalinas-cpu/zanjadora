@@ -386,6 +386,34 @@ def roturas_identificadas_por_mes(anio=None, poza=None):
     return [dict(r) for r in rows]
 
 
+def ranking_operadores(anio=None, mes=None, poza=None):
+    where, valores = _filtro_periodo(anio, mes, poza)
+    condicion_operador = "operador IS NOT NULL AND operador != ''"
+    where = f"{where} AND {condicion_operador}" if where else f"WHERE {condicion_operador}"
+    conn = get_db()
+    rows = conn.execute(f"""
+        SELECT
+            operador,
+            COUNT(*) AS registros,
+            COALESCE(SUM(horas_operadas), 0) AS horas_operadas_total,
+            COALESCE(SUM(avance_m), 0) AS avance_total,
+            COALESCE(SUM(avance_perimetral_m), 0) AS avance_perimetral_total,
+            COALESCE(SUM(avance_transversal_m), 0) AS avance_transversal_total,
+            COALESCE(SUM(combustible_l), 0) AS combustible_total
+        FROM registros {where}
+        GROUP BY operador
+        ORDER BY avance_total DESC
+    """, valores).fetchall()
+    conn.close()
+    resultado = []
+    for r in rows:
+        d = dict(r)
+        d["rendimiento_mh"] = _safe_div(d["avance_total"], d["horas_operadas_total"]) or 0
+        d["consumo_lh"] = _safe_div(d["combustible_total"], d["horas_operadas_total"]) or 0
+        resultado.append(d)
+    return resultado
+
+
 def ultimo_horometro_final():
     conn = get_db()
     row = conn.execute(

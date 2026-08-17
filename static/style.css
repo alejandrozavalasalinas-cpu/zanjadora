@@ -212,6 +212,9 @@ body {
 .dot-ok { background: var(--accent); }
 .dot-alert { background: var(--alert); }
 .chart-canvas-wrap { position: relative; height: 220px; }
+.chart-canvas-wrap-tall { height: 340px; }
+.rank-top { background: var(--gold-bg); }
+.rank-top td:first-child { font-weight: 700; color: var(--gold); }
 
 .form-panel .grid-form {
   display: grid;

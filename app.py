@@ -152,6 +152,25 @@ def tablero():
     )
 
 
+@app.route("/ranking")
+@login_required
+def ranking():
+    anio = request.args.get("anio", type=int)
+    mes = request.args.get("mes", type=int)
+    poza = request.args.get("poza") or None
+    ranking_data = models.ranking_operadores(anio=anio, mes=mes, poza=poza)
+    return render_template(
+        "ranking.html",
+        ranking=ranking_data,
+        meses=MESES,
+        anios_disponibles=models.listar_anios_disponibles(),
+        pozas_disponibles=models.listar_pozas_disponibles(),
+        anio_sel=anio,
+        mes_sel=mes,
+        poza_sel=poza,
+    )
+
+
 @app.route("/formulario", methods=["GET", "POST"])
 @login_required
 @operador_required

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Ranking{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <h1>Ranking de operadores</h1>
+    <p class="muted">
+      Comparación de desempeño por operador — avance en metros lineales
+      {%- if anio_sel or mes_sel or poza_sel %} · Periodo: {{ meses[mes_sel - 1][1] ~ ' ' if mes_sel else '' }}{{ anio_sel or 'todos los años' }}{% if poza_sel %} · Poza: {{ poza_sel }}{% endif %}{% endif %}
+    </p>
+  </div>
+</div>
+
+<form method="get" class="filtro-periodo">
+  <label>Año
+    <select name="anio" onchange="this.form.submit()">
+      <option value="">Todos</option>
+      {% for a in anios_disponibles %}
+      <option value="{{ a }}" {{ 'selected' if anio_sel == a else '' }}>{{ a }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Mes
+    <select name="mes" onchange="this.form.submit()">
+      <option value="">Todos</option>
+      {% for num, nombre in meses %}
+      <option value="{{ num }}" {{ 'selected' if mes_sel == num else '' }}>{{ nombre }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Poza
+    <select name="poza" onchange="this.form.submit()">
+      <option value="">Todas</option>
+      {% for p in pozas_disponibles %}
+      <option value="{{ p }}" {{ 'selected' if poza_sel == p else '' }}>{{ p }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  {% if anio_sel or mes_sel or poza_sel %}
+  <a href="{{ url_for('ranking') }}" class="btn-link">Limpiar filtro</a>
+  {% endif %}
+</form>
+
+<section class="panel chart-card">
+  <h2>Avance total por operador (m lineal)</h2>
+  <div class="chart-canvas-wrap chart-canvas-wrap-tall"><canvas id="chartRanking"></canvas></div>
+</section>
+
+<section class="panel">
+  <h2>Detalle por operador</h2>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Operador</th><th>Registros</th><th>Horas operadas</th>
+          <th>Avance total (m)</th><th>Perimetral (m)</th><th>Transversal (m)</th>
+          <th>Rendimiento (m/h)</th><th>Combustible (L)</th><th>Consumo (L/h)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in ranking %}
+        <tr class="{{ 'rank-top' if loop.index == 1 else '' }}">
+          <td>{{ loop.index }}</td>
+          <td>{{ r.operador }}</td>
+          <td>{{ "%.0f"|format(r.registros) }}</td>
+          <td>{{ "%.1f"|format(r.horas_operadas_total) }}</td>
+          <td>{{ "{:,.0f}".format(r.avance_total) }}</td>
+          <td>{{ "{:,.0f}".format(r.avance_perimetral_total) }}</td>
+          <td>{{ "{:,.0f}".format(r.avance_transversal_total) }}</td>
+          <td>{{ "%.2f"|format(r.rendimiento_mh) }}</td>
+          <td>{{ "%.0f"|format(r.combustible_total) }}</td>
+          <td>{{ "%.2f"|format(r.consumo_lh) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="10" class="empty">Todavía no hay registros para comparar.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
+<script>
+  const rankingData = {{ ranking|tojson }};
+  const ctx = document.getElementById('chartRanking');
+  if (ctx && rankingData.length) {
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: rankingData.map(r => r.operador),
+        datasets: [{
+          label: 'Avance total (m)',
+          data: rankingData.map(r => r.avance_total),
+          backgroundColor: '#2a6fdb',
+          borderRadius: 4,
+          maxBarThickness: 36,
+        }],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'm lineal' }, grid: { color: '#eef0f3' } },
+          y: { grid: { display: false } },
+        },
+      },
+    });
+  }
+</script>
+{% endblock %}
