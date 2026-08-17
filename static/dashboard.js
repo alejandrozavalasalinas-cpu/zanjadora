@@ -94,6 +94,18 @@ async function cargarGraficos() {
   if (ctxMantencion) {
     const horasParaMantencion = ordenado.map(r => r.hrs_para_mantencion);
     const umbral = ordenado.map(() => window.AVISO_ANTICIPADO || 0);
+
+    const ultimaConDato = [...ordenado].reverse().find(r => r.hrs_para_mantencion != null);
+    const horasRestantesEl = document.getElementById('mantHorasRestantes');
+    if (horasRestantesEl) {
+      if (ultimaConDato) {
+        const horas = ultimaConDato.hrs_para_mantencion;
+        horasRestantesEl.textContent = Math.round(horas).toLocaleString('es-CL') + ' h';
+        horasRestantesEl.style.color = horas <= (window.AVISO_ANTICIPADO || 0) ? COLOR_ALERT : COLOR_OK;
+      } else {
+        horasRestantesEl.textContent = '—';
+      }
+    }
     new Chart(ctxMantencion, {
       type: 'line',
       data: {
