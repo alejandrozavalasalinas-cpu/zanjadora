@@ -21,7 +21,12 @@
       </select>
     </label>
     <label>Operador
-      <input type="text" name="operador" value="{{ registro.operador or '' }}" placeholder="Nombre del operador" required>
+      <select name="operador" required>
+        <option value="" disabled {{ 'selected' if not registro.operador else '' }}>Selecciona un operador</option>
+        {% for o in operadores %}
+        <option value="{{ o.nombre }}" {{ 'selected' if registro.operador == o.nombre else '' }}>{{ o.nombre }}</option>
+        {% endfor %}
+      </select>
     </label>
     <label>Poza
       <select name="poza" required>

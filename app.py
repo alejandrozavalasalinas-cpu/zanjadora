@@ -219,6 +219,7 @@ def formulario():
         hoy=datetime.now().strftime("%Y-%m-%d"),
         registros=models.listar_registros(limit=15),
         pozas=models.listar_pozas(),
+        operadores=models.listar_operadores(),
         ultimo_horometro=models.ultimo_horometro_final(),
     )
 
@@ -319,7 +320,11 @@ def editar_registro(reg_id):
         except ValueError as e:
             flash(f"Error: {e}", "error")
     return render_template(
-        "editar_registro.html", registro=registro, params=params, pozas=models.listar_pozas()
+        "editar_registro.html",
+        registro=registro,
+        params=params,
+        pozas=models.listar_pozas(),
+        operadores=models.listar_operadores(),
     )
 
 
@@ -364,6 +369,7 @@ def parametros():
         "parametros.html",
         params=models.get_parametros(),
         pozas=models.listar_pozas(),
+        operadores=models.listar_operadores(),
     )
 
 
@@ -391,6 +397,31 @@ def crear_poza():
 def eliminar_poza(poza_id):
     models.eliminar_poza(poza_id)
     flash("Poza eliminada.", "success")
+    return redirect(url_for("parametros"))
+
+
+@app.route("/parametros/operadores", methods=["POST"])
+@login_required
+@operador_required
+def crear_operador():
+    nombre = (request.form.get("nombre") or "").strip()
+    apellido = (request.form.get("apellido") or "").strip()
+    try:
+        if not nombre or not apellido:
+            raise ValueError("El nombre y apellido son obligatorios.")
+        models.crear_operador(f"{nombre} {apellido}")
+        flash("Operador agregado.", "success")
+    except ValueError as e:
+        flash(f"Error: {e}", "error")
+    return redirect(url_for("parametros"))
+
+
+@app.route("/parametros/operadores/<int:operador_id>/eliminar", methods=["POST"])
+@login_required
+@operador_required
+def eliminar_operador(operador_id):
+    models.eliminar_operador(operador_id)
+    flash("Operador eliminado.", "success")
     return redirect(url_for("parametros"))
 
 

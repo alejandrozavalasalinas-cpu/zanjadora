@@ -116,6 +116,13 @@ def init_db():
             creado_en TEXT
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS operadores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT UNIQUE NOT NULL,
+            creado_en TEXT
+        )
+    """)
     cols_pozas = [r["name"] for r in conn.execute("PRAGMA table_info(pozas)").fetchall()]
     if "altura_cm" not in cols_pozas:
         conn.execute("ALTER TABLE pozas ADD COLUMN altura_cm REAL")
@@ -146,6 +153,18 @@ def init_db():
             f"INSERT INTO parametros (id, {cols}) VALUES (1, {placeholders})",
             tuple(DEFAULT_PARAMETROS.values()),
         )
+
+    row = conn.execute("SELECT COUNT(*) c FROM operadores").fetchone()
+    if row["c"] == 0:
+        distintos = conn.execute(
+            "SELECT DISTINCT operador FROM registros WHERE operador IS NOT NULL AND operador != ''"
+        ).fetchall()
+        for r in distintos:
+            conn.execute(
+                "INSERT OR IGNORE INTO operadores (nombre, creado_en) VALUES (?, ?)",
+                (r["operador"], datetime.utcnow().isoformat()),
+            )
+
     conn.commit()
     conn.close()
 
@@ -342,6 +361,34 @@ def eliminar_poza(poza_id):
 
 def listar_pozas_disponibles():
     return [p["nombre"] for p in listar_pozas()]
+
+
+def crear_operador(nombre):
+    conn = get_db()
+    try:
+        conn.execute(
+            "INSERT INTO operadores (nombre, creado_en) VALUES (?, ?)",
+            (nombre, datetime.utcnow().isoformat()),
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        raise ValueError("Ya existe un operador registrado con ese nombre.")
+    finally:
+        conn.close()
+
+
+def listar_operadores():
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM operadores ORDER BY nombre").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def eliminar_operador(operador_id):
+    conn = get_db()
+    conn.execute("DELETE FROM operadores WHERE id = ?", (operador_id,))
+    conn.commit()
+    conn.close()
 
 
 def picas_reemplazadas_por_mes(anio=None, poza=None):

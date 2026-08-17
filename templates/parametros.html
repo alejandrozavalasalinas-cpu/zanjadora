@@ -115,4 +115,41 @@
     </div>
   </form>
 </section>
+
+<section class="panel">
+  <h2>Operadores</h2>
+  <p class="muted">Registra a los operadores para que aparezcan como lista desplegable en el formulario de nuevo registro, evitando errores al escribir el nombre a mano.</p>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>Operador</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for o in operadores %}
+        <tr>
+          <td>{{ o.nombre }}</td>
+          <td>
+            <form method="post" action="{{ url_for('eliminar_operador', operador_id=o.id) }}" onsubmit="return confirm('¿Eliminar este operador?');">
+              <button type="submit" class="btn-link-danger">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2" class="empty">Todavía no hay operadores registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <form method="post" action="{{ url_for('crear_operador') }}" class="grid-form poza-form">
+    <label>Nombre
+      <input type="text" name="nombre" placeholder="Ej: Juan" required>
+    </label>
+    <label>Apellido
+      <input type="text" name="apellido" placeholder="Ej: Pérez" required>
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="btn-secondary">Agregar operador</button>
+    </div>
+  </form>
+</section>
 {% endblock %}

@@ -21,7 +21,13 @@
       </select>
     </label>
     <label>Operador
-      <input type="text" name="operador" placeholder="Nombre del operador" required>
+      <select name="operador" required>
+        <option value="" disabled selected>Selecciona un operador</option>
+        {% for o in operadores %}
+        <option value="{{ o.nombre }}">{{ o.nombre }}</option>
+        {% endfor %}
+      </select>
+      {% if not operadores %}<span class="muted">No hay operadores creados — agrégalos en <a href="{{ url_for('parametros') }}">Parámetros</a>.</span>{% endif %}
     </label>
     <label>Poza
       <select name="poza" required>
