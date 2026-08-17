@@ -119,7 +119,7 @@
   </div>
   <div class="kpi-card">
     <span class="kpi-label">Consumo promedio</span>
-    <span class="kpi-value">{{ "%.2f"|format(kpis.consumo_promedio) }} L/h</span>
+    <span class="kpi-value">{{ kpis.consumo_promedio | miles(2) }} L/h</span>
   </div>
   <div class="kpi-card {{ 'kpi-alert' if kpis.desvio_consumo_pct and kpis.desvio_consumo_pct > 0 else '' }}">
     <span class="kpi-label">Desvío vs objetivo consumo</span>
@@ -135,7 +135,7 @@
   </div>
   <div class="kpi-card">
     <span class="kpi-label">Rendimiento promedio</span>
-    <span class="kpi-value">{{ "%.2f"|format(kpis.rendimiento_promedio) }} m/h</span>
+    <span class="kpi-value">{{ kpis.rendimiento_promedio | miles(2) }} m/h</span>
   </div>
   {% if session.get('rol') != 'visor' %}
   <div class="kpi-card">
